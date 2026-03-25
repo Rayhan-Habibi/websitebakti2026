@@ -19,7 +19,7 @@ function Login() {
     // MAIN CONTAINER: Menggunakan Grid untuk split screen di desktop, stack di mobile.
     // GANTI baris 'bg-[...]' dengan URL gambar dedaunan asli jika sudah ada.
     <div
-      className="min-h-screen grid grid-cols-2 bg-cover bg-center text-white font-sans"
+      className="min-h-screen md:grid md:grid-cols-2 lg:grid lg:grid-cols-2 flex flex-col bg-cover bg-center text-white font-sans"
       style={{
         backgroundImage: `url(${loginBg})`,
         // Contoh cara pakai gambar asli:
@@ -47,14 +47,14 @@ function Login() {
         </div>
 
         {/* Kotak Guidebook (Dengan efek Glassmorphism tipis) */}
-        <div className="border border-white/20 bg-white/5 backdrop-blur-sm rounded-2xl p-8 max-w-xl space-y-6">
+        <div className="border border-[#E6E6E6] bg-white/30 rounded-2xl p-8 max-w-xl space-y-6">
           <div className="flex items-center gap-3 text-slate-300 uppercase tracking-wider font-semibold">
             <FiBookOpen className="text-2xl" />
             <span>Guidebook Penggunaan Website</span>
           </div>
           
           {/* Tombol UNDER DEVELOPMENT */}
-          <div className="bg-slate-300/10 rounded-xl p-6 text-center border border-white/10">
+          <div className="bg-[#91C397]/30 rounded-xl p-6 text-center border-1 border-white">
             <span className="text-2xl font-bold uppercase text-white/60 tracking-widest">
               Under Development
             </span>
@@ -65,11 +65,12 @@ function Login() {
       {/* ----------------- SECTOR KANAN: KARTU LOGIN ----------------- */}
       <div className="flex items-center justify-center p-6 md:p-12">
         {/* Kartu Login Putih/Abu-abu Terang */}
-        <div className="bg-[#F1F3F4] text-[#1E4D31] rounded-3xl p-10 lg:p-16 w-full max-w-md shadow-2xl space-y-10">
+        <div className="bg-[#D9D9D9] text-[#1E4D31] rounded-3xl p-10 lg:p-16 w-full max-w-md shadow-2xl space-y-10">
           
           {/* LOGO & NAMA (BAKTI UNAND) */}
           <div className="flex flex-col items-center gap-3 text-center">
-            
+            <img src={baktiLogoText} alt="Bakti Logo" className='w-md justify-center flex' />
+            <div className='w-full h-1 bg-[#014421]'></div>
           </div>
 
           {/* FORM LOGIN */}
@@ -83,7 +84,7 @@ function Login() {
               <input
                 type="email"
                 placeholder="Masukkan Email"
-                className="w-full px-5 py-3.5 bg-transparent border-2 border-[#1E4D31]/40 rounded-xl text-lg text-[#1E4D31] focus:border-[#2ECC71] focus:ring-1 focus:ring-[#2ECC71] outline-none transition"
+                className="w-full px-5 py-3.5 bg-transparent border-2 border-[#014421] rounded-xl text-lg text-[#1E4D31] focus:border-[#2ECC71] focus:ring-1 focus:ring-[#2ECC71] outline-none transition"
               />
             </div>
 
@@ -95,7 +96,7 @@ function Login() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Masukkan Kata Sandi"
-                className="w-full px-5 py-3.5 bg-transparent border-2 border-[#1E4D31]/40 rounded-xl text-lg text-[#1E4D31] focus:border-[#2ECC71] focus:ring-1 focus:ring-[#2ECC71] outline-none transition"
+                className="w-full px-5 py-3.5 bg-transparent border-2 border-[#014421] rounded-xl text-lg text-[#1E4D31] focus:border-[#2ECC71] focus:ring-1 focus:ring-[#2ECC71] outline-none transition"
               />
               {/* Tombol Tampilkan/Sembunyikan */}
               <button

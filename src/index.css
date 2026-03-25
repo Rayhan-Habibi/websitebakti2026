@@ -1,1 +1,93 @@
 @import "tailwindcss";
+
+@theme {
+  /* Warna yang sudah ada sebelumnya (kampus-primary, dll.) */
+  --color-kampus-primary: #1e3a8a;
+  --font-utama: 'Inter', sans-serif;
+
+  /* TAMBAHKAN WARNA BARU UNTUK SIDEBAR */
+  --color-sidebar-bg: #133F25;      /* Hijau Tua Latar Sidebar */
+  --color-sidebar-active: #487157;  /* Hijau Sedang Menu Aktif */
+  --color-sidebar-accent: #96DC7A;  /* Hijau Terang Garis Aksen */
+  --color-sidebar-placeholder: #C1C4C9; /* Abu-abu Placeholder */
+}
+/* OVERRIDE TEMA FULLCALENDAR */
+/* --- OVERRIDE TEMA FULLCALENDAR BAKTI UNAND --- */
+
+:root {
+  /* Warna garis grid utama (Hijau Tua) */
+  --fc-border-color: #91C397;
+}
+
+/* 1. Styling Judul Bulan (MAY) */
+.fc-toolbar-title {
+  font-weight: 900 !important;
+  font-size: 2rem !important;
+  text-transform: uppercase !important;
+  color: #133F25;
+  letter-spacing: 0.05em;
+  margin: 0 2rem !important;
+}
+/* Memaksa elemen di header tengah (prev, title, next) agar sejajar mendatar */
+.fc-toolbar-chunk:nth-child(2) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Memastikan tombol panah sejajar dengan teks */
+.fc .fc-button-primary {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important; /* Menghilangkan padding agar icon tidak turun */
+}
+
+/* 2. Styling Tombol Prev & Next (< >) agar transparan dan iconnya hijau */
+.fc .fc-button-primary {
+  background-color: transparent !important;
+  border: none !important;
+  color: #133F25 !important;
+  font-size: 1.5rem;
+}
+.fc .fc-button-primary:hover,
+.fc .fc-button-primary:active,
+.fc .fc-button-primary:focus {
+  background-color: transparent !important;
+  color: #2ECC71 !important; /* Hijau terang saat diklik */
+  box-shadow: none !important;
+}
+.fc-icon {
+  font-weight: 900;
+}
+
+/* 3. Menebalkan garis grid dan mewarnai teks tanggal */
+.fc-theme-standard td, .fc-theme-standard th {
+  border-width: 2px !important;
+  border-color: #91C397 !important;
+}
+.fc-daygrid-day-number {
+  color: #133F25;
+  font-weight: 900;
+  font-size: 1.1rem;
+  padding: 8px !important;
+}
+
+/* 4. Trik Sakti: Membuat Event Berjejer Menyamping */
+/* Defaultnya numpuk ke bawah, kita ubah jadi flex row */
+.fc-daygrid-day-events {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important; /* Jarak antar kotak warna */
+  padding: 0 8px 8px 8px !important; /* Jarak dari pinggir kotak tanggal */
+}
+
+/* Mematikan sifat block dari pembungkus event bawaan */
+.fc-daygrid-event-harness {
+  width: auto !important;
+  margin: 0 !important;
+}
+/* Menghilangkan background transparan bawaan fc-event */
+.fc-event {
+  background: transparent !important;
+  border: none !important;
+}
