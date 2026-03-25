@@ -5,11 +5,19 @@ import { FiGrid, FiClipboard, FiUser, FiSettings, FiLogOut } from 'react-icons/f
 import baktiLogo from '../assets/Icons/BaktiLogo.webp';
 import QrIcon from './Icons/QrIcon';
 import TodoIcon from './Icons/TodoIcon';
+import { useLocation } from 'react-router-dom';
 
 function Sidebar() {
   // SIMULASI MENU AKTIF: Dalam praktiknya, React Router otomatis menangani ini dengan NavLink
   const [activeMenu, setActiveMenu] = useState('absensi');
   const navigate = useNavigate(); // Hook untuk navigasi programatik
+
+  const location = useLocation();
+  
+  // Contoh: Jika URL saat ini adalah "website.com/dashboard/absensi"
+  // location.pathname akan bernilai "/dashboard/absensi"
+  // Setelah di-split dan pop, currentRoute = "absensi"
+  const currentRoute = location.pathname.split('/').filter(Boolean).pop();
 
   // Konfigurasi Navigasi
   const navItems = [
@@ -38,7 +46,7 @@ function Sidebar() {
       <nav className="flex-grow space-y-4 px-3">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeMenu === item.id;
+          const isActive = currentRoute === item.id;
           const path = item.path;
 
           // Cek apakah menu aktif atau placeholder
