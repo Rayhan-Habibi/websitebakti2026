@@ -13,12 +13,10 @@ function Sidebar() {
 
   // Konfigurasi Navigasi
   const navItems = [
-    { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/absensi' },
-    { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/todo' },
+    { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
+    { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
     // Ikon placeholder bulat abu-abu sesuai desain Anda
-    { id: 'placeholder1', name: 'Placeholder Menu 1', icon: 'placeholder', path: '/p1' },
-    { id: 'placeholder2', name: 'Placeholder Menu 2', icon: 'placeholder', path: '/p2' },
-  ];
+  ]
 
   return (
     // PARENT: sidebar-bg (warna custom v4), transisi lebar 24px -> 288px (w-72) saat hover
@@ -91,13 +89,7 @@ function Sidebar() {
       </nav>
 
       {/* 3. BOTTOM SECTION (Misalnya Tombol Logout/User) */}
-      <div className="px-3 pb-4 space-y-4 flex-shrink-0">
-         {/* Contoh item placeholder di bawah */}
-         <div className="flex items-center gap-5 px-5 py-4">
-            <div className="w-12 h-12 rounded-full bg-sidebar-placeholder flex-shrink-0" />
-            <div className="h-7 w-full rounded-md bg-sidebar-placeholder opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100 flex-shrink-0" />
-         </div>
-      </div>
+      
     </aside>
   );
 }
