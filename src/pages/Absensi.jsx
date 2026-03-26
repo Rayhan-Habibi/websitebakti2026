@@ -1,4 +1,5 @@
 import React from 'react';
+import RekapAbsen from '../components/RekapAbsen';
 
 export default function Absensi() {
   return (
@@ -107,6 +108,12 @@ export default function Absensi() {
             <li>balal aoowdm a?n anowdmoamd amowmo dmawm dowa</li>
           </ol>
         </div>
+
+        {/* KARTU 4: Edit Absensi */}
+        <div className='bg-white lg:col-span-2 mt-2'>
+            <RekapAbsen />
+        </div>
+        
 
       </div>
     </div>

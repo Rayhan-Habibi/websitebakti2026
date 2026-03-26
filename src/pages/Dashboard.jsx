@@ -1,25 +1,40 @@
 // src/pages/DashboardUmum.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Calendar from '../components/Calendar';
 import Todo from '../components/Todo';
-// Import komponen kalender/todo kamu
 
 function Dashboard() {
+  // 1. Buat state viewMode di sini
+  const [viewMode, setViewMode] = useState('global');
+  const dummyDashboardTodos = [
+    {
+      title: "Buat WEB dengan standar operasional",
+      type: "deadline",
+      startDate: "24/3/2026",
+      endDate: "31/3/2026",
+      alert: "Sisa 1 Hari Lagi"
+    },
+    {
+      title: "Rapat Divisi RnB 1",
+      type: "event",
+      time: "19.00 WIB",
+      location: "Kupi Batigo"
+    },
+    { title: "Buat WEB dengan standar operasional", type: "simple" },
+    { title: "Buat WEB dengan standar operasional", type: "simple" },
+  ];
+
   return (
-    // MAIN LAYOUT: Berikan padding-left minimal 96px (pl-24) agar konten tidak tertutup sidebar
     <div className="min-h-screen bg-[#F1F3F4] flex pl-24 transition-all duration-300">
-      
-      {/* 1. SIDEBAR MENEMPEL DI KIRI */}
       <Sidebar />
 
-      {/* 2. KONTEN UTAMA DASHBOARD */}
-      <main className="flex-grow p-10 space-y-8">
-        {/* Bagian Header Dashboard (logo user, judul) */}
-        <header className="flex items-center bg-white p-6 shadow-sm border border-green-800/10">
+      <main className="flex-grow p-5 space-y-4">
+        {/* HEADER DASHBOARD */}
+        <header className="flex items-center p-2 relative">
           <h1 className="text-4xl text-center w-full font-bold font-serif text-[#004D25]">DASHBOARD</h1>
-          {/* Bagian User/Koor MIT */}
-          <div className="flex items-center gap-3 text-right">
+          
+          <div className="flex items-center gap-3 text-right absolute right-2">
             <div>
                 <p className="font-bold text-[#004D25]">Nay Rangers</p>
                 <p className="text-sm text-green-900/70">KOOR MIT</p>
@@ -30,16 +45,46 @@ function Dashboard() {
           </div>
         </header>
 
-        {/* Bagian Kalender, To-Do dll... */}
-        <div className="bg-white p-8 shadow-sm border border-green-800/10">
-          {/* Panggil komponen Kalender custom mu di sini */}
-          <Calendar/>
-          {/* ... render kalender ... */}
-        </div>
         
-        {/* Bagian To-Do */}
-       <Todo/>
 
+        {/* 3. GRID KALENDER & TO-DO */}
+        {/* Pastikan menggunakan flex-col di mobile agar bertumpuk rapi */}
+        <div className='flex flex-col lg:grid lg:grid-cols-2 px-2 gap-4'>
+            
+            {/* Lempar viewMode sebagai props ke Calendar */}
+            <div className='bg-white px-4 pb-2'>
+                {/* 2. TOMBOL SWITCH GLOBAL / DIVISI */}
+                <div className="flex justify-end px-2 pt-2 my-2">
+                  <div className="flex border-2 border-[#133F25] font-extrabold text-sm rounded-sm overflow-hidden shadow-sm">
+                    <button 
+                      onClick={() => setViewMode('global')}
+                      className={`px-6 py-1.5 transition-colors ${
+                        viewMode === 'global' 
+                          ? 'bg-[#133F25] text-white' 
+                          : 'bg-white text-[#133F25] hover:bg-gray-100'
+                      }`}
+                    >
+                      Global
+                    </button>
+                    <button 
+                      onClick={() => setViewMode('divisi')}
+                      className={`px-6 py-1.5 transition-colors ${
+                        viewMode === 'divisi' 
+                          ? 'bg-[#133F25] text-white' 
+                          : 'bg-white text-[#133F25] hover:bg-gray-100'
+                      }`}
+                    >
+                      Divisi
+                    </button>
+                  </div>
+                </div>
+                <Calendar viewMode={viewMode} />
+              </div>
+            
+            {/* Nantinya Todo juga bisa menerima viewMode untuk logika filternya */}
+            <Todo viewMode={viewMode} tasks={dummyDashboardTodos} />
+            
+        </div>
       </main>
     </div>
   );

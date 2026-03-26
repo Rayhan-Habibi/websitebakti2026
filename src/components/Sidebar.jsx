@@ -6,6 +6,8 @@ import baktiLogo from '../assets/Icons/BaktiLogo.webp';
 import QrIcon from './Icons/QrIcon';
 import TodoIcon from './Icons/TodoIcon';
 import { useLocation } from 'react-router-dom';
+import DashboardIcon from './Icons/DashboardIcon';
+import LogoutIcon from './Icons/LogoutIcon';
 
 function Sidebar() {
   // SIMULASI MENU AKTIF: Dalam praktiknya, React Router otomatis menangani ini dengan NavLink
@@ -21,6 +23,7 @@ function Sidebar() {
 
   // Konfigurasi Navigasi
   const navItems = [
+    { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
     { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
     { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
     // Ikon placeholder bulat abu-abu sesuai desain Anda
@@ -96,8 +99,23 @@ function Sidebar() {
         })}
       </nav>
 
-      {/* 3. BOTTOM SECTION (Misalnya Tombol Logout/User) */}
-      
+      {/* 3. BOTTOM SECTION (Tombol Logout) */}
+      {/* Tambahkan px-3 pb-6 agar rata kiri-kanannya sama persis dengan menu navigasi di atas */}
+      <div className="px-3">
+        <div 
+          className="flex items-center gap-6 px-4 py-2 rounded-2xl cursor-pointer transition-colors text-white/70 hover:bg-sidebar-active/50 hover:text-white"
+        >
+          {/* BUNGKUS IKON: Ini pelindung agar ikon tidak gepeng saat sidebar mengecil */}
+          <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
+            <LogoutIcon />
+          </div>
+
+          {/* TEKS LOGOUT: Hanya muncul saat sidebar di-hover */}
+          <span className="text-2xl font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
+            Logout
+          </span>
+        </div>
+      </div>
     </aside>
   );
 }
