@@ -1,5 +1,5 @@
 import React from 'react';
-import RekapAbsen from '../components/RekapAbsen';
+import RekapAbsen from '../../components/RekapAbsen';
 
 export default function Absensi() {
   return (

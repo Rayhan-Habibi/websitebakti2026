@@ -1,4 +1,4 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom'; // Gunakan NavLink untuk styling aktif
 import { FiGrid, FiClipboard, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
 // Import logo (sesuaikan path-nya)
@@ -8,11 +8,13 @@ import TodoIcon from './Icons/TodoIcon';
 import { useLocation } from 'react-router-dom';
 import DashboardIcon from './Icons/DashboardIcon';
 import LogoutIcon from './Icons/LogoutIcon';
+import DataPanitiaIcon from './Icons/DataPanitiaIcon';
 
 function Sidebar() {
   // SIMULASI MENU AKTIF: Dalam praktiknya, React Router otomatis menangani ini dengan NavLink
   const [activeMenu, setActiveMenu] = useState('absensi');
   const navigate = useNavigate(); // Hook untuk navigasi programatik
+  const [currentRole, setCurrentRole] = useState('kestari'); // Simulasi role, bisa diganti dengan 'anggota' untuk testing
 
   const location = useLocation();
   
@@ -22,12 +24,26 @@ function Sidebar() {
   const currentRoute = location.pathname.split('/').filter(Boolean).pop();
 
   // Konfigurasi Navigasi
-  const navItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
-    { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
-    { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
-    // Ikon placeholder bulat abu-abu sesuai desain Anda
-  ]
+      // 1. Definisikan menu dasar yang dimiliki SEMUA panitia
+    const baseNavItems = [
+      { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
+      { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
+      { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
+    ];
+
+    // 2. Gandakan menu dasar tersebut ke dalam variabel baru
+    let navItems = [...baseNavItems]; 
+
+    // 3. Tambahkan menu sisipan sesuai Role (Dynamic Pushing)
+    if (currentRole === 'kestari') {
+      // .push() akan menambahkan item baru ke urutan paling bawah
+      navItems.push(
+        { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
+      );
+    } 
+
+    // Terakhir, tinggal kamu render navItems ini pakai .map() di JSX kamu!
+  
 
   return (
     // PARENT: sidebar-bg (warna custom v4), transisi lebar 24px -> 288px (w-72) saat hover

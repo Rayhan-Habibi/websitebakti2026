@@ -6,6 +6,19 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanValue, absensiData = [] }) {
   // 2. STATE UNTUK DATA DINAMIS (Untuk Demo Dinamis)
   const [displayedData, setDisplayedData] = useState([]);
 
+  // 3. STATE UNTUK POP-UP SUKSES (Setelah Scan Berhasil)
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleScanBerhasil = (dataQR) => {
+    // 1. Kirim data ke backend via Axios
+    // axios.post('/api/absen', { qr: dataQR }).then(() => {
+    
+    // 2. Munculkan Pop-up Sukses
+    setShowSuccess(true); 
+    
+    // })
+  };
+
   useEffect(() => {
     // Setel data dari props atau dummy saat modal dibuka
     if (isOpen) {
@@ -68,7 +81,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanValue, absensiData = [] }) {
           <div className="flex justify-center mb-8">
             <div className="w-[80%] md:w-[40%] lg:w-[30%] bg-[#D9D9D9]/40 border-2 border-gray-400 rounded-xl p-8 flex flex-col items-center justify-center">
               <FiCamera className="text-6xl text-[#133F25] mb-4" />
-              <button className="flex items-center justify-center gap-2.5 bg-[#133F25] text-white font-black text-sm lg:text-base uppercase px-6 py-3 rounded-lg shadow-md hover:bg-green-900 transition-colors w-full">
+              <button onClick={() => handleScanBerhasil("")} className="flex items-center justify-center gap-2.5 bg-[#133F25] text-white font-black text-sm lg:text-base uppercase px-6 py-3 rounded-lg shadow-md hover:bg-green-900 transition-colors w-full">
                 <FiCamera className="text-xl" />
                 <span>Ambil Foto</span>
               </button>

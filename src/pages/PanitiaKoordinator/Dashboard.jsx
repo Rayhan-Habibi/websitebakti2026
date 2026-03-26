@@ -1,8 +1,8 @@
 // src/pages/DashboardUmum.jsx
 import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Calendar from '../components/Calendar';
-import Todo from '../components/Todo';
+import Sidebar from '../../components/Sidebar';
+import Calendar from '../../components/Calendar';
+import Todo from '../../components/Todo';
 
 function Dashboard() {
   // 1. Buat state viewMode di sini

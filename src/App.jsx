@@ -1,15 +1,15 @@
-import { useState } from 'react'
 import './App.css'
-import LandingPage from './pages/LandingPage'
+import LandingPage from './pages/PanitiaKoordinator/LandingPage'
 import { Routes, Route } from 'react-router-dom'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import Absensi from './pages/Absensi'
-import TodoPage from './pages/TodoPage'
+import Login from './pages/PanitiaKoordinator/Login'
+import Dashboard from './pages/PanitiaKoordinator/Dashboard'
+import Absensi from './pages/PanitiaKoordinator/Absensi'
+import TodoPage from './pages/PanitiaKoordinator/TodoPage'
 import PanitiaLayout from './Layouts/PanitiaLayout'
+import DataPanitiaPage from './pages/PanitiaKoordinator/Kestari/DataPanitiaPage'
+import DetailDivisiPage from './pages/PanitiaKoordinator/Kestari/DetailDivisiPage'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <Routes>
@@ -19,6 +19,8 @@ function App() {
         <Route path="/panitia/dashboard" element={<Dashboard />} />
         <Route path="/panitia/absensi" element={<Absensi />} />
         <Route path="/panitia/todo" element={<TodoPage />} />
+        <Route path="/panitia/data-panitia" element={<DataPanitiaPage />} />
+        <Route path='/panitia/data-panitia/:namaDivisi' element={<DetailDivisiPage />}/>
       </Route>
 
       {/* Route dengan path="*" ini sangat penting untuk menangani halaman 404 (Not Found) */}

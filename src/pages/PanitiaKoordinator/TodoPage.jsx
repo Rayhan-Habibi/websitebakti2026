@@ -1,6 +1,6 @@
 import React from 'react';
-import Todo from '../components/Todo';
-import MissedOut from '../components/MissedOut';
+import Todo from '../../components/Todo';
+import MissedOut from '../../components/MissedOut';
 
 export default function TodoPage() {
   // 1. DATA MENTAH DARI API (Simulasi)
@@ -26,6 +26,8 @@ export default function TodoPage() {
     }
   ];
 
+  //Cek role saat ini
+ 
   // 2. LOGIKA PEMISAHAN DATA (Frontend Logic Sementara)
   const today = new Date(); 
   today.setHours(0, 0, 0, 0); // Reset jam biar akurat cuma ngecek tanggal
@@ -70,7 +72,7 @@ export default function TodoPage() {
   return (
     // Layout Utama Halaman Todo
     <div className="min-h-screen bg-[#F1F3F4] pl-24 p-10 flex flex-col gap-8">
-      <h1 className="text-4xl font-bold font-serif text-[#004D25]">HALAMAN TO-DO</h1>
+      <h1 className="text-4xl text-center font-bold font-serif text-[#004D25]">TO-DO List</h1>
       
       {/* 3. LEMPAR DATA YANG SUDAH DIFILTER SEBAGAI PROPS */}
       <div className="flex flex-col gap-10">

@@ -1,6 +1,10 @@
 import React from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FiClock, FiMapPin, FiAlertCircle } from 'react-icons/fi';
+import PlusIcon  from './Icons/PlusIcon';
+import AddTodoPopUp from './AddTodoPopUp';
+import SuccessPopUp from './SuccessPopUp';
 
 function Todo({ tasks = [] }) { // Menerima tasks dari TodoPage
   // 1. CEK LOKASI URL SAAT INI
@@ -8,6 +12,18 @@ function Todo({ tasks = [] }) { // Menerima tasks dari TodoPage
   // Jika URL saat ini mengandung '/todo', maka mode detail aktif
   const isDetailedView = location.pathname.includes('/todo');
 
+  //success pop up controller
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+
+  //kontrol todo muncul atau tidak, untuk testing bisa diganti ke false
+  const [showAddTodo, setShowAddTodo] = useState(false);
+
+  function handleShowTodo() {
+    setShowAddTodo(true)
+  }
+
+  //cek role saat ini, untuk memunculkan button tambah
+  const [currentRole, setCurrentRole] = useState('koordinator'); // Simulasi role, bisa diganti dengan 'anggota' untuk testing
 
   return (
     <div className="w-full flex flex-col gap-6 font-sans h-full">
@@ -37,10 +53,15 @@ function Todo({ tasks = [] }) { // Menerima tasks dari TodoPage
       <div className="h-full flex flex-col bg-white border-2 border-gray-200 shadow-sm overflow-hidden rounded-xl">
         
         {/* HEADER HIJAU GELAP */}
-        <div className="bg-[#133F25] py-4 flex-shrink-0">
-          <h2 className="text-white text-center text-3xl font-black tracking-widest uppercase">
+        <div className="bg-[#133F25] py-4 flex items-center p-2 relative flex-shrink-0">
+          <h2 className="text-4xl text-center w-full font-bold text-[#E6e6e6]">
             TO-DO {isDetailedView && "LIST"} {/* Tambah kata LIST kalau di mode detail */}
           </h2>
+          {currentRole === 'koordinator' && isDetailedView && (
+            <button onClick={handleShowTodo} className="active:scale-95 flex justify-center gap-2 items-center bg-[#397F22] text-[#e6e6e6] hover:bg-[#397F22]/80 font-bold mx-4 py-2 min-w-[120px] px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+              <PlusIcon /> Add
+            </button>
+          )}
         </div>
 
         {/* DAFTAR TUGAS */}
@@ -109,8 +130,22 @@ function Todo({ tasks = [] }) { // Menerima tasks dari TodoPage
             </li>
           ))}
         </ul>
-        
       </div>
+        {/*Add Todo PopUp*/}
+        <AddTodoPopUp 
+        isOpen={showAddTodo} 
+        onClose={() => setShowAddTodo(false)} 
+        onSuccess={() => {
+          setShowAddTodo(true);      // 1. Tetap buka formulir
+          setIsSuccessOpen(true);   // 2. Buka pop-up sukses
+        }}
+        />
+        {/* Success PopUp */}
+        {/* MODAL SUKSES */}
+        <SuccessPopUp
+          isOpen={isSuccessOpen}
+          onClose={() => setIsSuccessOpen(false)}
+        />
     </div>
   );
 }

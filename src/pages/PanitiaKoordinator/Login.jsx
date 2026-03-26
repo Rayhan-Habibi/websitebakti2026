@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 // Ikon dari react-icons (Heroicons set)
 import { FiBookOpen, FiEye, FiEyeOff } from 'react-icons/fi';
-import loginBg from "../assets/LoginBackground.webp"
-import baktiLogoText from "../assets/BaktiLogoText.webp"
+import loginBg from "../../assets/LoginBackground.webp"
+import baktiLogoText from "../../assets/BaktiLogoText.webp"
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
