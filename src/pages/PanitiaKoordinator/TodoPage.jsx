@@ -27,7 +27,7 @@ export default function TodoPage() {
   ];
 
   //Cek role saat ini
- 
+  
   // 2. LOGIKA PEMISAHAN DATA (Frontend Logic Sementara)
   const today = new Date(); 
   today.setHours(0, 0, 0, 0); // Reset jam biar akurat cuma ngecek tanggal
@@ -71,8 +71,11 @@ export default function TodoPage() {
 
   return (
     // Layout Utama Halaman Todo
-    <div className="min-h-screen bg-[#F1F3F4] pl-24 p-10 flex flex-col gap-8">
-      <h1 className="text-4xl text-center font-bold font-serif text-[#004D25]">TO-DO List</h1>
+    // PERBAIKAN RESPONSIVE: pt-24 (mobile) lalu md:pt-10 (desktop). Padding jadi p-4 di mobile.
+    <div className="min-h-screen bg-[#F1F3F4] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 flex flex-col gap-6 md:gap-8 w-full overflow-x-hidden">
+      
+      {/* PERBAIKAN: text-3xl di mobile, text-4xl di desktop */}
+      <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#014421]">To-Do List</h1>
       
       {/* 3. LEMPAR DATA YANG SUDAH DIFILTER SEBAGAI PROPS */}
       <div className="flex flex-col gap-10">

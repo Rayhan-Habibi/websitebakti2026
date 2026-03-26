@@ -69,6 +69,7 @@ export default function Calendar({ viewMode }) {
         dayHeaders={false} 
         eventContent={renderKotakWarna}
         contentHeight="auto"
+        height="auto"
         fixedWeekCount={false}
       />
 

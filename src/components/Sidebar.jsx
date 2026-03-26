@@ -1,138 +1,158 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom'; // Gunakan NavLink untuk styling aktif
-import { FiGrid, FiClipboard, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
-// Import logo (sesuaikan path-nya)
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FiMenu, FiX, FiGrid, FiClipboard, FiUser, FiSettings, FiLogOut } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
 import baktiLogo from '../assets/Icons/BaktiLogo.webp';
 import QrIcon from './Icons/QrIcon';
 import TodoIcon from './Icons/TodoIcon';
-import { useLocation } from 'react-router-dom';
 import DashboardIcon from './Icons/DashboardIcon';
 import LogoutIcon from './Icons/LogoutIcon';
 import DataPanitiaIcon from './Icons/DataPanitiaIcon';
 
 function Sidebar() {
-  // SIMULASI MENU AKTIF: Dalam praktiknya, React Router otomatis menangani ini dengan NavLink
   const [activeMenu, setActiveMenu] = useState('absensi');
-  const navigate = useNavigate(); // Hook untuk navigasi programatik
-  const [currentRole, setCurrentRole] = useState('kestari'); // Simulasi role, bisa diganti dengan 'anggota' untuk testing
-
+  const navigate = useNavigate();
   const location = useLocation();
   
-  // Contoh: Jika URL saat ini adalah "website.com/dashboard/absensi"
-  // location.pathname akan bernilai "/dashboard/absensi"
-  // Setelah di-split dan pop, currentRoute = "absensi"
+  // 1. STATE BARU UNTUK MENU HP
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const [currentRole, setCurrentRole] = useState('kestari'); 
   const currentRoute = location.pathname.split('/').filter(Boolean).pop();
 
   // Konfigurasi Navigasi
-      // 1. Definisikan menu dasar yang dimiliki SEMUA panitia
-    const baseNavItems = [
-      { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
-      { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
-      { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
-    ];
+  const baseNavItems = [
+    { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
+    { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
+    { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
+  ];
 
-    // 2. Gandakan menu dasar tersebut ke dalam variabel baru
-    let navItems = [...baseNavItems]; 
+  let navItems = [...baseNavItems]; 
 
-    // 3. Tambahkan menu sisipan sesuai Role (Dynamic Pushing)
-    if (currentRole === 'kestari') {
-      // .push() akan menambahkan item baru ke urutan paling bawah
-      navItems.push(
-        { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
-      );
-    } 
+  if (currentRole === 'kestari') {
+    navItems.push(
+      { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
+    );
+  } 
 
-    // Terakhir, tinggal kamu render navItems ini pakai .map() di JSX kamu!
-  
+  // Fungsi untuk handle klik menu (navigasi sekaligus tutup menu di HP)
+  const handleNavigation = (path, id) => {
+    setActiveMenu(id);
+    navigate({ pathname: path });
+    setIsMobileMenuOpen(false); // Tutup menu HP setelah diklik
+  };
 
   return (
-    // PARENT: sidebar-bg (warna custom v4), transisi lebar 24px -> 288px (w-72) saat hover
-    <aside className="bg-green fixed top-0 left-0 h-screen bg-sidebar-bg text-white flex flex-col py-6 shadow-2xl z-50 transition-all duration-300 ease-in-out overflow-hidden w-20 hover:w-72 group">
-      
-      {/* 1. LOGO SECTION */}
-      <div className="flex justify-center items-center h-20 mb-12 flex-shrink-0">
-        {/* Logo Icon tetap di tengah */}
-        <img 
-          src={baktiLogo} 
-          alt="Logo BAKTI" 
-          className="w-14 h-14 object-contain transition-transform group-hover:scale-110" 
-        />
-        {/* Teks Logo muncul saat hover (jika desain asli ada teksnya) */}
-        {/* <span className="absolute left-24 text-2xl font-bold font-serif whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity delay-100">BAKTI UNAND</span> */}
-      </div>
+    <>
+      {/* PARENT CONTAINER: Menjadi Navbar di Mobile, Sidebar di Desktop */}
+      {/* Perhatikan penambahan class md:... untuk mode desktop */}
+      <aside className="fixed top-0 left-0 z-50 bg-sidebar-bg text-white shadow-2xl transition-all duration-300 ease-in-out 
+        w-full h-16 flex flex-row items-center px-4 justify-between 
+        md:h-screen md:flex-col md:py-6 md:w-15 md:hover:w-72 md:justify-start md:px-0 group"
+      >
+        
+        {/* SPASI KIRI DI MOBILE (Agar Logo bisa persis di tengah) */}
+        <div className="w-8 md:hidden"></div>
 
-      {/* 2. NAVIGATION MENU SECTION */}
-      <nav className="flex-grow space-y-4 px-3">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentRoute === item.id;
-          const path = item.path;
+        {/* 1. LOGO SECTION */}
+        {/* Di mobile: tinggi menyesuaikan navbar. Di desktop: tinggi 20 dan ada margin bawah */}
+        <div className="flex justify-center items-center flex-shrink-0 md:h-20 md:mb-12">
+          <img 
+            src={baktiLogo} 
+            alt="Logo BAKTI" 
+            className="w-10 h-10 object-contain transition-transform md:group-hover:scale-110" 
+          />
+        </div>
 
-          // Cek apakah menu aktif atau placeholder
-          const isPlaceholder = item.icon === 'placeholder';
+        {/* TOMBOL HAMBURGER DI MOBILE (Berada di ujung kanan) */}
+        <div className="w-8 flex justify-end md:hidden">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-white hover:text-gray-300 transition-colors"
+          >
+            {isMobileMenuOpen ? <FiX size={28} /> : <FiMenu size={28} />}
+          </button>
+        </div>
 
-          return (
-            <div key={item.id} onClick={() => setActiveMenu(item.id)} className="relative">
-              {/* Garis Aksen Terang di kiri menu aktif */}
-              {isActive && (
-                <div className="absolute left-0 top-3 bottom-3 w-1 bg-sidebar-accent rounded-r-full" />
-              )}
+        {/* 2. NAVIGATION MENU SECTION (HANYA MUNCUL DI DESKTOP) */}
+        <nav className="hidden md:flex flex-col flex-grow space-y-2 px-1 w-full">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentRoute === item.id;
+            const isPlaceholder = item.icon === 'placeholder';
 
-              {/* ITEM MENU */}
-              <div
-                onClick={() => navigate({ pathname: path })}
-                className={`flex items-center gap-6 px-4 py-2 rounded-2xl cursor-pointer transition-colors
-                  ${isActive 
-                    ? 'bg-sidebar-active text-white' // Styling Aktif sesuai desain
-                    : 'text-white/70 hover:bg-sidebar-active/50 hover:text-white' // Styling Inaktif
-                  }
-                `}
-              >
-                {/* Bagian Ikon (Lebar Tetap) */}
-                <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
+            return (
+              <div key={item.id} className="relative">
+                {isActive && (
+                  <div className="absolute left-0 top-3 bottom-3 w-1 bg-sidebar-accent rounded-r-full" />
+                )}
+                <div
+                  onClick={() => handleNavigation(item.path, item.id)}
+                  className={`flex items-center gap-3 px-4 py-1 rounded-2xl cursor-pointer transition-colors
+                    ${isActive ? 'bg-sidebar-active text-white' : 'text-white/70 hover:bg-sidebar-active/50 hover:text-white'}
+                  `}
+                >
+                  <div className="flex justify-center items-center w-5 text-xl flex-shrink-0">
+                    {isPlaceholder ? <div className="w-10 h-10 rounded-full bg-sidebar-placeholder" /> : <Icon />}
+                  </div>
                   {isPlaceholder ? (
-                    // Placeholder bulat abu-abu
-                    <div className="w-12 h-12 rounded-full bg-sidebar-placeholder" />
+                    <div className="h-7 w-full rounded-md bg-sidebar-placeholder opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100 flex-shrink-0" />
                   ) : (
-                    // Ikon asli
-                    <Icon />
+                    <span className="text-2xl font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
+                      {item.name}
+                    </span>
                   )}
                 </div>
-
-                {/* Bagian Teks Label (Muncul saat hover group) */}
-                {isPlaceholder ? (
-                  // Placeholder kotak abu-abu
-                  <div className="h-7 w-full rounded-md bg-sidebar-placeholder opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100 flex-shrink-0" />
-                ) : (
-                  // Teks asli
-                  <span className="text-2xl font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
-                    {item.name}
-                  </span>
-                )}
               </div>
+            );
+          })}
+        </nav>
+
+        {/* 3. BOTTOM SECTION / LOGOUT (HANYA MUNCUL DI DESKTOP) */}
+        <div className="hidden md:block px-1 w-full">
+          <div className="flex items-center gap-6 px-4 py-2 rounded-2xl cursor-pointer transition-colors text-white/70 hover:bg-sidebar-active/50 hover:text-white">
+            <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
+              <LogoutIcon />
             </div>
-          );
-        })}
-      </nav>
-
-      {/* 3. BOTTOM SECTION (Tombol Logout) */}
-      {/* Tambahkan px-3 pb-6 agar rata kiri-kanannya sama persis dengan menu navigasi di atas */}
-      <div className="px-3">
-        <div 
-          className="flex items-center gap-6 px-4 py-2 rounded-2xl cursor-pointer transition-colors text-white/70 hover:bg-sidebar-active/50 hover:text-white"
-        >
-          {/* BUNGKUS IKON: Ini pelindung agar ikon tidak gepeng saat sidebar mengecil */}
-          <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
-            <LogoutIcon />
+            <span className="text-2xl font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
+              Logout
+            </span>
           </div>
-
-          {/* TEKS LOGOUT: Hanya muncul saat sidebar di-hover */}
-          <span className="text-2xl font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
-            Logout
-          </span>
         </div>
-      </div>
-    </aside>
+      </aside>
+
+      {/* 4. DROPDOWN MENU MOBILE (MUNCUL KALAU HAMBURGER DIKLIK) */}
+      {/* Menggunakan fixed agar melayang menutupi konten di bawahnya */}
+      {isMobileMenuOpen && (
+        <div className="fixed top-16 left-0 w-full bg-sidebar-bg/95 backdrop-blur-md shadow-2xl flex flex-col md:hidden z-40 border-t border-white/10 animate-fade-in pb-6 pt-4 px-4 space-y-4">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentRoute === item.id;
+            
+            return (
+              <div 
+                key={`mobile-${item.id}`}
+                onClick={() => handleNavigation(item.path, item.id)}
+                className={`flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer transition-colors
+                  ${isActive ? 'bg-sidebar-active text-white font-bold' : 'text-white/80 hover:bg-sidebar-active/50'}
+                `}
+              >
+                <div className="text-2xl"><Icon /></div>
+                <span className="text-xl">{item.name}</span>
+              </div>
+            )
+          })}
+          
+          {/* Pembatas untuk Logout di HP */}
+          <div className="w-full h-[1px] bg-white/20 my-2"></div>
+          
+          {/* Tombol Logout Mobile */}
+          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer text-red-400 hover:bg-red-500/20 transition-colors">
+            <div className="text-2xl"><LogoutIcon /></div>
+            <span className="text-xl font-bold">Logout</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

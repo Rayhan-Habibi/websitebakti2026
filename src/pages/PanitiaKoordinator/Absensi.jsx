@@ -1,32 +1,35 @@
 import React from 'react';
 import RekapAbsen from '../../components/RekapAbsen';
+import IndikatorDivisi from '../../components/IndikatorDivisi';
 
 export default function Absensi() {
   return (
-    // BUNGKUS UTAMA: pl-24 untuk memberi ruang pada sidebar di desktop
-    // Di mobile (layar kecil), kita kurangi padding-nya agar lebih lega
-    <div className="min-h-screen bg-[#F1F3F4] p-6 lg:p-10 lg:pl-24 font-sans text-[#133F25]">
+    // BUNGKUS UTAMA
+    <div className="min-h-screen bg-[#F1F3F4] p-3 pt-24 md:p-5 md:pt-5 lg:pl-24 font-sans text-[#133F25] w-full overflow-x-hidden">
       
       {/* --- HEADER --- */}
-      <div className="relative flex justify-center items-center mb-10 mt-4">
-        {/* Judul dengan efek text-shadow tipis biar mirip desain */}
-        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-widest drop-shadow-sm">
+      {/* PERBAIKAN: Beri h-12 atau h-16 agar w-full dan pembungkus relative-nya stabil */}
+      <div className="relative flex justify-center items-center mb-6 mt-3 w-full h-12 md:h-16">
+        
+        {/* Judul: Set w-full dan text-center agar pas di tengah */}
+        <h1 className="text-3xl md:text-4xl font-[#014421] font-bold uppercase drop-shadow-sm text-center w-full z-10">
           ABSENSI
         </h1>
         
         {/* Badge User di Kanan Atas */}
-        <div className="absolute right-0 flex flex-col items-center">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-[#67E8F9] rounded-xl shadow-sm"></div>
-          <span className="text-xs md:text-sm font-black mt-1 uppercase">MIT</span>
+        {/* PERBAIKAN: Bungkus dengan absolute right-2 agar melayang di pojok kanan! */}
+        <div className="absolute right-2 md:right-6 top-0 md:top-2 z-20 w-fit transform scale-90 md:scale-100 flex-shrink-0">
+          <IndikatorDivisi namaDivisi="MIT" warna="#67E8F9" />
         </div>
+
       </div>
 
       {/* --- GRID UTAMA --- */}
       {/* 1 Kolom di HP, 2 Kolom di Laptop (lg) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-2">
         
         {/* KARTU 1: QR ABSENSI */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-200 flex flex-col items-center">
+        <div className="bg-white rounded-md px-6 py-4 shadow-sm border-2 border-gray-200 flex flex-col items-center">
           <h2 className="text-2xl md:text-3xl font-black mb-8 self-start">
             Qr Absensi Kamu
           </h2>
@@ -61,13 +64,12 @@ export default function Absensi() {
         </div>
 
         {/* KARTU 2: RIWAYAT ABSENSI */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-200 flex flex-col items-center">
+        <div className="bg-white rounded-md px-6 py-4 shadow-sm border-2 border-gray-200 flex flex-col items-center">
           <h2 className="text-2xl md:text-3xl font-black mb-8 self-start">
             Riwayat Absensi
           </h2>
           
           {/* Pie Chart Murni CSS (Conic Gradient) */}
-          {/* Persentase warna disesuaikan agar mirip dengan desainmu */}
           <div 
             className="w-48 h-48 md:w-56 md:h-56 rounded-full mb-8 shadow-inner"
             style={{ 
@@ -95,8 +97,7 @@ export default function Absensi() {
         </div>
 
         {/* KARTU 3: TATA CARA ABSENSI */}
-        {/* col-span-1 di HP, col-span-2 di Laptop (membentang penuh) */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-200 lg:col-span-2 mt-2">
+        <div className="bg-white rounded-md px-6 py-4 shadow-sm border-2 border-gray-200 lg:col-span-2 mt-2">
           <h2 className="text-2xl md:text-3xl font-black mb-4">
             Tata Cara Absensi
           </h2>
@@ -110,11 +111,10 @@ export default function Absensi() {
         </div>
 
         {/* KARTU 4: Edit Absensi */}
-        <div className='bg-white lg:col-span-2 mt-2'>
+        <div className='bg-white rounded-md lg:col-span-2 mt-2 shadow-sm border-2 border-gray-200'>
             <RekapAbsen />
         </div>
         
-
       </div>
     </div>
   );
