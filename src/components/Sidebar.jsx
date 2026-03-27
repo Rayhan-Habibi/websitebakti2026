@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiGrid, FiClipboard, FiUser, FiSettings, FiLogOut } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
+import { FiMenu, FiX, } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
 import baktiLogo from '../assets/Icons/BaktiLogo.webp';
 import QrIcon from './Icons/QrIcon';
 import TodoIcon from './Icons/TodoIcon';
 import DashboardIcon from './Icons/DashboardIcon';
 import LogoutIcon from './Icons/LogoutIcon';
 import DataPanitiaIcon from './Icons/DataPanitiaIcon';
+import useAuthStore from '../Store/useAuthStore';
 
 function Sidebar() {
   const [activeMenu, setActiveMenu] = useState('absensi');
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   // 1. STATE BARU UNTUK MENU HP
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,6 +42,25 @@ function Sidebar() {
     navigate({ pathname: path });
     setIsMobileMenuOpen(false); // Tutup menu HP setelah diklik
   };
+
+  //logout logic
+
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = () => {
+    try {
+      setIsLoggingOut(true); 
+      setTimeout(() => {
+        logout();
+        console.log("Logout berhasil!");
+        navigate('/login');
+        // Nggak perlu setIsLoggingOut(false) karena saat pindah halaman, komponen Sidebar ini akan otomatis mati/hilang.
+      }, 800);
+      } catch (error) {
+        console.error("Logout error:", error);
+        alert("Terjadi kesalahan saat logout. Silakan coba lagi.");
+      }
+  }
 
   return (
     <>
@@ -108,13 +129,27 @@ function Sidebar() {
         </nav>
 
         {/* 3. BOTTOM SECTION / LOGOUT (HANYA MUNCUL DI DESKTOP) */}
-        <div className="hidden md:block px-1 w-full">
-          <div className="flex items-center gap-6 px-4 py-2 rounded-2xl cursor-pointer transition-colors text-white/70 hover:bg-sidebar-active/50 hover:text-white">
+        <div className="hidden md:block px-1 w-full pb-6">
+          <div 
+            onClick={!isLoggingOut ? handleLogout : undefined}
+            className={`flex items-center gap-6 px-4 py-2 rounded-2xl transition-colors ${
+              isLoggingOut 
+                ? 'opacity-70 cursor-not-allowed text-white' 
+                : 'cursor-pointer text-white/70 hover:bg-sidebar-active/50 hover:text-white'
+            }`}
+          >
             <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
-              <LogoutIcon />
+              {isLoggingOut ? (
+                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <LogoutIcon />
+              )}
             </div>
             <span className="text-2xl font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
-              Logout
+              {isLoggingOut ? 'Keluar...' : 'Logout'}
             </span>
           </div>
         </div>
@@ -146,10 +181,27 @@ function Sidebar() {
           <div className="w-full h-[1px] bg-white/20 my-2"></div>
           
           {/* Tombol Logout Mobile */}
-          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer text-red-400 hover:bg-red-500/20 transition-colors">
-            <div className="text-2xl"><LogoutIcon /></div>
-            <span className="text-xl font-bold">Logout</span>
-          </div>
+          <button 
+            onClick={handleLogout} 
+            disabled={isLoggingOut}
+            className={`flex items-center gap-4 px-6 py-4 rounded-2xl w-full text-left transition-colors ${
+              isLoggingOut 
+                ? 'opacity-70 cursor-not-allowed text-red-300' 
+                : 'cursor-pointer text-red-400 hover:bg-red-500/20'
+            }`}
+          >
+            <div className="text-2xl">
+              {isLoggingOut ? (
+                <svg className="animate-spin h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <LogoutIcon />
+              )}
+            </div>
+            <span className="text-xl font-bold">{isLoggingOut ? 'Keluar...' : 'Logout'}</span>
+          </button>
         </div>
       )}
     </>

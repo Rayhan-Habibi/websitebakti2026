@@ -144,6 +144,7 @@ function Todo({ tasks = [] }) {
       <SuccessPopUp
         isOpen={isSuccessOpen}
         onClose={() => setIsSuccessOpen(false)}
+        message="To-Do Berhasil Ditambahkan!"
       />
     </div>
   );

@@ -131,6 +131,7 @@ export default function DetailDivisiPage() {
       <SuccessPopUp 
         isOpen={isSuccessOpen}
         onClose={() => setIsSuccessOpen(false)}
+        message="Anggota Berhasil Ditambahkan!"
       />
     </div>
   );

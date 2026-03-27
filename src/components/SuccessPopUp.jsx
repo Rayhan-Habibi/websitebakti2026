@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FiCheck } from 'react-icons/fi';
 
-export default function SuccessPopUp({ isOpen, onClose }) {
+export default function SuccessPopUp({ isOpen, onClose, message }) {
   
   // Menutup pop-up otomatis setelah 2 detik
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function SuccessPopUp({ isOpen, onClose }) {
 
         {/* TEKS PESAN (Disesuaikan dengan desain baru) */}
         <h3 className="text-[22px] font-medium text-[#133F25] tracking-wide text-center">
-          Berhasil Di Tambahkan
+          {message}
         </h3>
         
       </div>

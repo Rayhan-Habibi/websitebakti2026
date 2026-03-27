@@ -15,29 +15,25 @@ function Dashboard() {
   ];
 
   return (
-    <div className="lg:max-h-[80%] md:max-h-[80%] min-h-screen pt-20 md:pt-0 bg-[#F1F3F4] flex lg:pl-15 transition-all duration-300 w-full overflow-x-hidden">
+    // PERBAIKAN: max-h-[80%] dan flex DHAPUS total. Biarkan dia tumbuh natural.
+    <div className="min-h-screen pt-20 md:pt-0 bg-[#F1F3F4] lg:pl-24 transition-all duration-300 w-full overflow-x-hidden">
       
-      {/* main kontainer */}
-      <main className="flex-grow p-3 md:p-5 space-y-4 w-full relative"> 
+      {/* PERBAIKAN: flex-grow DHAPUS karena parent-nya sudah bukan flex */}
+      <main className="p-3 md:p-5 space-y-4 w-full relative"> 
         
         {/* HEADER DASHBOARD */}
         <header className="flex items-center justify-center p-2 relative w-full h-20 mb-4 md:mb-0">
-          
-          {/* Judul */}
           <h1 className="text-3xl md:text-4xl text-center w-full font-bold text-[#004D25] z-10">DASHBOARD</h1>
-          
-          {/* INDIKATOR DIVISI DIKEMBALIKAN KE DALAM HEADER SINI! */}
           <div className="absolute right-2 md:right-6 top-1 md:top-2 z-20 w-fit transform scale-90 md:scale-100 flex-shrink-0">
             <IndikatorDivisi namaDivisi="MIT" warna="#67E8F9" />
           </div>
-          
         </header>
 
         {/* 3. GRID KALENDER & TO-DO */}
-        <div className='flex flex-col lg:grid lg:grid-cols-2 px-0 md:px-2 gap-6 md:gap-4'>
+        <div className='flex flex-col lg:grid lg:grid-cols-2 px-0 md:px-2 gap-6 md:gap-4 w-full'>
             
             {/* Kalender Section */}
-            <div className='bg-white rounded-md px-4 pb-2 w-full'>
+            <div className='bg-white rounded-md px-4 pb-2 w-full min-w-0'>
                 <div className="flex justify-center md:justify-end px-2 pt-4 md:pt-2 my-2">
                   <div className="flex border-2 border-[#133F25] font-extrabold text-sm rounded-sm overflow-hidden shadow-sm">
                     <button 
@@ -56,13 +52,13 @@ function Dashboard() {
                 </div>
                 
                 {/* WADAH KALENDER */}
-                <div className="overflow-x-auto w-full pb-2">
+                <div className="w-full pb-2">
                    <Calendar viewMode={viewMode} />
                 </div>
             </div>
             
             {/* Todo Section */}
-            <div className="w-full">
+            <div className="w-full min-w-0">
                <Todo viewMode={viewMode} tasks={dummyDashboardTodos} />
             </div>
             
