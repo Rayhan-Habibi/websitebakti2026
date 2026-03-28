@@ -5,9 +5,8 @@ import useAuthStore from '../Store/useAuthStore'; // Import gudang Zustand kita
 function ProtectedRoute() {
   // 1. Cek isi  (Zustand) apakah ada token
   const token = useAuthStore((state) => state.token);
+  const role = useAuthStore((state) => state.role);
 
-  // 2. Kalau nggak ada token, tendang ke halaman Login!
-  // 'replace' gunanya biar user nggak bisa klik tombol 'Back' di browser untuk maksa masuk lagi
   if (!token) {
     return <Navigate to="/login" replace />;
   }

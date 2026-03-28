@@ -1,15 +1,11 @@
 import React from 'react';
-import { FiEdit, FiXCircle } from 'react-icons/fi'; 
 import { useState } from 'react';
 import RekapAbsenPopUp from './RekapAbsenPopUp'; 
 import CancelIcon from './Icons/CancelIcon';
 import EditIcon from './Icons/EditIcon';
+import CancelModal from './CancelModal';
 
 // 1. FUNGSI PEMBANTU FORMATTING (Logika Frontend)
-const formatKehadiran = (kehadiran) => {
-  const hadirText = kehadiran.hadir !== null && kehadiran.hadir !== undefined ? kehadiran.hadir : "--";
-  return `${hadirText}/${kehadiran.total}`;
-};
 
 const getStatusStyle = (status) => {
   switch (status) {
@@ -21,17 +17,16 @@ const getStatusStyle = (status) => {
 };
 
 // 2. KOMPONEN UTAMA
-function RekapAbsen({ data = [] }) {
-  const dummyData = [
-    { id: 1, no: 1, kegiatanName: "Rapat Divisi RnB 1", kehadiran: { hadir: 27, total: 30 }, status: 'Active' },
-    { id: 2, no: 2, kegiatanName: "Rapat Global 1", kehadiran: { hadir: null, total: 100 }, status: 'Inactive' },
-    { id: 3, no: 3, kegiatanName: "Rapat Divisi X SC", kehadiran: { hadir: 30, total: 30 }, status: 'Expired' },
-  ];
+function RekapAbsen({ data = [], onRefresh }) {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedKegiatanForEdit, setSelectedKegiatanForEdit] = useState("");
+  const [dataId, setDataId] = useState(null);
+  const [namaKegiatan, setNamaKegiatan] = useState("")
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  console.log(data)
 
-  const displayedData = data.length > 0 ? data : dummyData;
+
 
   return (
     <div className="w-full bg-white border border-gray-100 rounded-md shadow-lg p-4 md:p-8 font-sans">
@@ -59,19 +54,19 @@ function RekapAbsen({ data = [] }) {
           </div>
 
           {/* BARIS DATA */}
-          {displayedData.map((item) => (
+          {data.map((item, index) => (
             <div 
               key={item.id} 
               // PERBAIKAN: Dikembalikan ke border-[#014421] persis kode aslimu!
               className="flex items-center text-center py-2 font-semibold text-black/80 text-md border-b-2 border-[#014421] mb-1 group hover:bg-gray-50 transition-colors"
             >
-              <div className="w-[8%] text-black text-md font-bold">{item.no}</div>
+              <div className="w-[8%] text-black text-md font-bold">{index + 1}</div>
               
               <div className="w-[32%] text-left pl-2 text-md font-bold text-black/90 truncate pr-2" title={item.kegiatanName}>
-                  {item.kegiatanName}
+                  {item.nama_kegiatan}
               </div>
               
-              <div className="w-[20%] text-black/60 font-black text-md tracking-wide">{formatKehadiran(item.kehadiran)}</div>
+              <div className="w-[20%] text-black/60 font-black text-md tracking-wide">{item.jumlah_kehadiran}</div>
               
               <div className="w-[40%] flex justify-center items-center gap-6">
                 
@@ -85,18 +80,29 @@ function RekapAbsen({ data = [] }) {
                     onClick={() => {
                       setSelectedKegiatanForEdit(item);
                       setIsEditModalOpen(true);
+                      setDataId(item.id)
+                      setNamaKegiatan(item.nama_kegiatan)
                     }}
-                    className="flex items-center gap-2 bg-[#014421] text-white font-black uppercase px-3 py-2 md:px-4 md:py-2.5 rounded-md shadow-md hover:bg-green-900 transition-colors"
+                    disabled={item.status === "active"}
+                    className="disabled:bg-gray-400 flex items-center gap-2 bg-[#014421] text-white font-black uppercase px-3 py-2 md:px-4 md:py-2.5 rounded-md shadow-md hover:bg-green-900 transition-colors"
                   >
                     {/* Ukuran icon disesuaikan w-4 h-4 */}
                     <EditIcon className="w-4 h-4 flex-shrink-0" />
                     <span className='hidden lg:inline text-xs'>Edit</span>
                   </button>
                   
-                  <button className="flex items-center gap-2 bg-[#EB0000] text-white font-black uppercase px-3 py-2 md:px-4 md:py-2.5 rounded-md shadow-md hover:bg-red-800 transition-colors">
+                  <button
+                    onClick={
+                      ()=>{
+                        setDataId(item.id)
+                        setDeleteModalOpen(true)
+                      }
+
+                    }
+                  className="flex items-center gap-2 bg-[#EB0000] text-white font-black uppercase px-3 py-2 md:px-4 md:py-2.5 rounded-md shadow-md hover:bg-red-800 transition-colors">
                     {/* Ukuran icon disesuaikan w-4 h-4 */}
                     <CancelIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className='hidden lg:inline text-xs'>Cancel</span>
+                    <span className='hidden lg:inline text-xs'>Delete</span>
                   </button>
 
                 </div>
@@ -110,8 +116,17 @@ function RekapAbsen({ data = [] }) {
       <RekapAbsenPopUp 
         isOpen={isEditModalOpen} 
         onClose={() => setIsEditModalOpen(false)} 
-        kegiatanValue={selectedKegiatanForEdit?.kegiatanName} 
+        kegiatanId={dataId}
         absensiData={selectedKegiatanForEdit?.absensiData} 
+        namaKegiatan={namaKegiatan}
+      />
+      <CancelModal
+        isOpen={deleteModalOpen}
+        onClose={()=> setDeleteModalOpen(false)}
+        id={dataId}
+        message="Hapus Kegiatan?"
+        onRefresh={onRefresh}
+        endpoint={"kegiatan"}
       />
     </div>
   );

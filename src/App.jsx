@@ -15,6 +15,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<LandingPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/panitia" element={<PanitiaLayout />}>

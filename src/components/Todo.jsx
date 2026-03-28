@@ -1,29 +1,36 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiClock, FiMapPin, FiAlertCircle } from 'react-icons/fi';
+import { FiClock, FiMapPin, FiAlertCircle, FiCheck } from 'react-icons/fi';
 import PlusIcon  from './Icons/PlusIcon';
 import AddTodoPopUp from './AddTodoPopUp';
 import SuccessPopUp from './SuccessPopUp';
+import useAuthStore from '../Store/useAuthStore';
 
-function Todo({ tasks = [] }) { 
-  // 1. CEK LOKASI URL SAAT INI
+// Tambahkan onRefresh di props
+function Todo({ tasks = [], onToggle }) { 
   const location = useLocation();
   const isDetailedView = location.pathname.includes('/todo');
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [showAddTodo, setShowAddTodo] = useState(false);
+  const role = useAuthStore((state) => state.role);
+
+  // STATE LOKAL UNTUK OPTIMISTIC UI
+  const [localTasks, setLocalTasks] = useState([]);
+
+  // Sinkronkan data dari parent (Dashboard) ke state lokal
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   function handleShowTodo() {
     setShowAddTodo(true)
   }
 
-  const [currentRole, setCurrentRole] = useState('koordinator'); 
-
   return (
     <div className="w-full flex flex-col gap-6 font-sans h-full">
       
-      {/* 3. KOTAK NOTE: HANYA MUNCUL DI HALAMAN DETAIL */}
+      {/* KOTAK NOTE: HANYA MUNCUL DI HALAMAN DETAIL */}
       {isDetailedView && (
         <div className="bg-white border-2 border-[#014421] rounded-2xl px-6 py-4 shadow-sm">
           <h3 className="font-bold text-lg text-[#014421] mb-2 uppercase">NOTE :</h3>
@@ -44,25 +51,19 @@ function Todo({ tasks = [] }) {
         </div>
       )}
 
-      {/* 4. KONTAINER UTAMA TO-DO */}
+      {/* KONTAINER UTAMA TO-DO */}
       <div className="h-full flex flex-col bg-white border-2 border-gray-200 shadow-sm overflow-hidden rounded-xl">
         
         {/* HEADER HIJAU GELAP */}
-        {/* PERBAIKAN: justify-center agar tulisan rapi, padding disesuaikan */}
         <div className="bg-[#133F25] py-4 md:py-4 flex items-center justify-center p-2 relative flex-shrink-0">
-          
-          {/* PERBAIKAN: text-2xl di mobile, text-4xl di desktop. Tambah z-10 */}
           <h2 className="text-2xl md:text-4xl text-center w-full font-bold text-[#E6e6e6] z-10">
             TO-DO 
           </h2>
-          
-          {currentRole === 'koordinator' && isDetailedView && (
-            /* PERBAIKAN: Padding kecil di HP (px-3 py-1.5), min-w-[120px] HANYA untuk desktop (md:). mx-4 dihapus agar tidak nabrak ke tengah */
+          {(role === 'koordinator' || role === 'INTI') && isDetailedView && (
             <button 
               onClick={handleShowTodo} 
               className="absolute right-3 md:right-6 z-20 active:scale-95 flex justify-center gap-1 md:gap-2 items-center bg-[#397F22] text-[#e6e6e6] hover:bg-[#397F22]/80 font-bold py-1.5 px-3 md:py-2 md:min-w-[120px] md:px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-xs md:text-base"
             >
-              {/* Bungkus icon agar proporsional mengecil di HP */}
               <div className="w-3 md:w-4 flex items-center justify-center">
                 <PlusIcon />
               </div>
@@ -73,62 +74,107 @@ function Todo({ tasks = [] }) {
 
         {/* DAFTAR TUGAS */}
         <ul className="flex flex-col flex-grow">
-          {tasks.map((todo, index) => (
-            <li 
-              key={index} 
-              className={`flex flex-col px-6 py-5 ${
-                index !== tasks.length - 1 ? 'border-b-2 border-[#133F25]' : ''
-              }`}
-            >
-              <div className="flex justify-between w-full">
-                
-                <div className="flex items-start gap-4 lg:w-3/4 w-2/3">
-                  <div className="w-4 h-4 rounded-full bg-[#133F25] flex-shrink-0 mt-1.5"></div>
+          {/* MENGGUNAKAN localTasks BUKAN tasks */}
+          {localTasks.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 italic font-bold">
+              Belum ada tugas untuk divisi ini.
+            </div>
+          ) : (
+            localTasks.map((todo) => (
+              <li 
+                key={todo.unique_id} 
+                className={`flex flex-col px-6 py-5 hover:bg-gray-50 transition-colors ${
+                  todo.unique_id !== localTasks.length - 1 ? 'border-b-2 border-[#133F25]' : ''
+                }`}
+              >
+                <div className="flex items-start gap-4 w-full">
                   
-                  <div className="flex flex-col">
-                    <span className="text-xl font-bold text-[#133F25]">
-                      {todo.title}
+                  {/* CHECKBOX CUSTOM */}
+                  <button 
+                    onClick={() => onToggle(todo.id, todo.is_done)}
+                    className={`w-6 h-6 rounded flex-shrink-0 mt-1 border-2 flex items-center justify-center transition-colors ${
+                      todo.is_done 
+                        ? 'bg-[#133F25] border-[#133F25]' 
+                        : 'border-[#133F25] hover:bg-gray-200'
+                    }`}
+                  >
+                    <FiCheck className="text-white text-lg font-bold" />
+                  </button>
+                  
+                  {/* KONTEN TEKS */}
+                  <div className="flex flex-col w-full">
+                    
+                    {/* Judul langsung tembak 'tugas' dari API */}
+                    <span className={`text-xl font-bold transition-all ${
+                      todo.is_done ? 'text-gray-400 line-through' : 'text-[#133F25]'
+                    }`}>
+                      {todo.tugas} 
                     </span>
 
-                    {isDetailedView && todo.desc && (
-                      <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                        {todo.desc}
+                    {/* Deskripsi */}
+                    {todo.deskripsi && (
+                      <p className={`text-sm mt-2 leading-relaxed ${
+                        todo.is_done ? 'text-gray-300' : 'text-gray-600 font-medium'
+                      }`}>
+                        {todo.deskripsi}
                       </p>
                     )}
 
-                    {!isDetailedView && todo.type === 'deadline' && (
-                      <div className="flex flex-wrap gap-4 text-[13px] font-black mt-1 uppercase tracking-wide">
-                        <span className="text-[#133F25]">Start Date : {todo.startDate}</span>
-                        <span className="text-red-600">End Date : {todo.endDate}</span>
+                    {/* TANGGAL: Langsung tembak start_date dan deadline dari API */}
+                    {todo.start_date && todo.deadline && (
+                      <div className={`flex flex-wrap gap-x-6 gap-y-2 text-[14px] font-black mt-4 uppercase tracking-wide ${
+                         todo.is_done ? 'opacity-50' : ''
+                      }`}>
+                        <span className="text-[#133F25]">
+                          Start: {todo.start_date.split('T')[0]}
+                        </span>
+                        <span className="text-[#EB0000]">
+                          Deadline: {todo.deadline.split('T')[0]}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* --- KONDISI 2: JIKA INI ADALAH KEGIATAN (RAPAT/DLL) --- */}
+                    {todo.tipe_item === 'kegiatan' && (
+                      <div className={`flex flex-col gap-3 mt-4 ${todo.is_done ? 'opacity-50' : ''}`}>
+                        
+                        {/* Tanggal Kegiatan */}
+                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[14px] font-black uppercase tracking-wide">
+                          <span className="text-[#133F25]">
+                            Tgl: {todo.tanggal_mulai ? todo.tanggal_mulai.split('T')[0] : '-'}
+                          </span>
+                          {/* Jika kegiatan ada tanggal selesainya juga, kita tampilkan */}
+                          {todo.tanggal_selesai && todo.tanggal_selesai !== todo.tanggal_mulai && (
+                            <span className="text-[#EB0000]">
+                              Sampai: {todo.tanggal_selesai.split('T')[0]}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Jam dan Lokasi (Pakai Icon) */}
+                        <div className="flex flex-wrap gap-6 text-sm font-semibold text-[#133F25]">
+                          {todo.waktu && (
+                            <div className="flex items-center gap-1.5">
+                              <FiClock className="text-lg" /> 
+                              {todo.waktu}
+                            </div>
+                          )}
+                          {todo.lokasi && (
+                            <div className="flex items-center gap-1.5">
+                              <FiMapPin className="text-lg" /> 
+                              {todo.lokasi}
+                            </div>
+                          )}
+                        </div>
+
                       </div>
                     )}
                     
-                    {!isDetailedView && todo.type === 'event' && (
-                      <div className="flex flex-wrap gap-4 text-sm font-semibold text-[#133F25] mt-1">
-                        <div className="flex items-center gap-1.5"><FiClock /> {todo.time}</div>
-                        <div className="flex items-center gap-1.5"><FiMapPin /> {todo.location}</div>
-                      </div>
-                    )}
                   </div>
                 </div>
-
-                {todo.alert && (
-                  <div className="flex items-start justify-end gap-2 text-red-600 font-bold text-sm lg:text-base whitespace-nowrap lg:w-1/4 w-1/3 mt-0.5">
-                    <FiAlertCircle className="text-xl lg:text-2xl stroke-[2.5]" />
-                    <span className="hidden md:inline">{todo.alert}</span>
-                  </div>
-                )}
-              </div>
-
-              {isDetailedView && todo.type === 'deadline' && (
-                <div className="flex flex-wrap justify-end gap-6 text-[14px] font-black mt-6 uppercase tracking-wide w-full pr-2">
-                  <span className="text-[#133F25]">Start Date : {todo.startDate}</span>
-                  <span className="text-red-600">End Date : {todo.endDate}</span>
-                </div>
-              )}
-              
-            </li>
-          ))}
+              </li>
+            ))
+          )}
         </ul>
       </div>
 
@@ -136,8 +182,8 @@ function Todo({ tasks = [] }) {
         isOpen={showAddTodo} 
         onClose={() => setShowAddTodo(false)} 
         onSuccess={() => {
-          setShowAddTodo(true);      // 1. Tetap buka formulir
-          setIsSuccessOpen(true);   // 2. Buka pop-up sukses
+          setShowAddTodo(false);     // Tutup pop up form
+          setIsSuccessOpen(true);   // Buka pop-up sukses
         }}
       />
 

@@ -5,31 +5,39 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { FiX } from 'react-icons/fi';
 
 // 1. Terima viewMode dari props
-export default function Calendar({ viewMode }) {
+export default function Calendar({ viewMode, events }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDateStr, setSelectedDateStr] = useState('');
   const [selectedEvents, setSelectedEvents] = useState([]);
-  
-  // HAPUS baris const [viewMode, setViewMode] = useState('global'); karena sudah ada di props!
 
-  const dummyEvents = [
-    { title: 'Global', date: '2026-05-01', backgroundColor: '#EF4444', type: 'global' },
-    { title: 'MIT', date: '2026-05-09', backgroundColor: '#67E8F9', type: 'divisi' },
-    // ... (data dummy lainnya tetap sama)
-  ];
+  const formattedEvents = events.map((event) => {
+    // Memotong "2026-03-28T02:35..." menjadi "2026-03-28" saja
+    const justDate = event.date ? event.date.split('T')[0] : '';
 
-  const displayedEvents = dummyEvents.filter((event) => {
-    if (viewMode === 'global') return event.type === 'global';
-    return event.type === 'divisi';
+    // Mengubah 'color_hint' dari backend menjadi kode warna aslimu
+    let bgColor = '#133F25'; // Warna default hijau gelap
+    if (event.color_hint === 'red' || event.jenis === 'Global') bgColor = '#EF4444';
+    else if (event.color_hint === 'blue' || event.jenis === 'MIT') bgColor = '#67E8F9';
+    else if (event.color_hint === 'yellow' || event.jenis === 'Cofas') bgColor = '#FBBF24';
+    else if (event.color_hint === 'green' || event.jenis === 'RND') bgColor = '#4ADE80';
+
+    // Gabungkan data asli dengan data yang sudah dimodifikasi
+    return {
+      ...event,             // Bawa semua properti asli (id, title, lokasi, dll)
+      date: justDate,       // Timpa format tanggalnya
+      backgroundColor: bgColor // Tambahkan properti untuk warna kotak FullCalendar
+    };
+  });
+
+  const displayedEvents = formattedEvents.filter((event) => {
+    if (viewMode === 'global') return event.jenis === 'Global';
+    return event.jenis !== 'Global'; 
   });
 
   // FUNGSI SAAT TANGGAL DIKLIK
   const handleDateClick = (arg) => {
     const clickedDate = arg.dateStr; 
-
-    // Filter dari daftar event yang sedang TAMPIL saja
     const eventsOnThisDay = displayedEvents.filter((event) => event.date === clickedDate);
-
     const dateObj = new Date(clickedDate);
     const day = dateObj.getDate();
     const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();

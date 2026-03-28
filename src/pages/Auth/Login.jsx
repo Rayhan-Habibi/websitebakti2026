@@ -42,14 +42,12 @@ function Login() {
       })
 
       const token = response.data.token;
+      const role = response.data.data.role; 
       // Ambil token dari backend
-      
-      // (Opsional) Kalau backend-mu ngasih data user (nama/role) sekalian di respon login
-      const userData = response.data.user || null;
 
       // EKSEKUSI ZUSTAND! 
       // Ini otomatis nyimpan ke RAM komponen DAN ke Local Storage. Boom!
-      login(token, userData);
+      login(token, role);
       navigate('/panitia/dashboard');
       setShowSuccessPopup(true);
 

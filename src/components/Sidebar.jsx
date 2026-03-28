@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
 import baktiLogo from '../assets/Icons/BaktiLogo.webp';
@@ -14,11 +14,10 @@ function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const currentRole = useAuthStore((state) => state.role);
   
   // 1. STATE BARU UNTUK MENU HP
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const [currentRole, setCurrentRole] = useState('kestari'); 
   const currentRoute = location.pathname.split('/').filter(Boolean).pop();
 
   // Konfigurasi Navigasi
@@ -30,7 +29,7 @@ function Sidebar() {
 
   let navItems = [...baseNavItems]; 
 
-  if (currentRole === 'kestari') {
+  if (currentRole === "KESTARI") {
     navItems.push(
       { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
     );
@@ -61,6 +60,16 @@ function Sidebar() {
         alert("Terjadi kesalahan saat logout. Silakan coba lagi.");
       }
   }
+
+  //Fetch user data
+  const fetchUserData = useAuthStore((state) => state.fetchUserData);
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (!user) {
+      fetchUserData();
+    }
+  }, [fetchUserData, user]);
 
   return (
     <>

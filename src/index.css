@@ -4,7 +4,7 @@
   /* Warna yang sudah ada sebelumnya (kampus-primary, dll.) */
   --color-kampus-primary: #1e3a8a;
   --font-utama: 'Inter', sans-serif;
-
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   /* TAMBAHKAN WARNA BARU UNTUK SIDEBAR */
   --color-sidebar-bg: #133F25;      /* Hijau Tua Latar Sidebar */
   --color-sidebar-active: #487157;  /* Hijau Sedang Menu Aktif */

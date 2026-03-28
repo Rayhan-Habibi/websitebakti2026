@@ -1,53 +1,84 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import useAuthStore from '../../../Store/useAuthStore';
+import bgDivisi from "../../../assets/DivisiBackground.webp"
 
 export default function DataPanitiaPage() {
   // Data divisi (nantinya bisa didapat dari backend)
-  const divisiList = [
-    { id: 'inti', nama: 'INTI', bgImg: '/assets/LoginBackground.webp' },
-    { id: 'mit', nama: 'MIT', bgImg: '/assets/LoginBackground.webp' },
-    { id: 'acara', nama: 'ACARA', bgImg: '/assets/LoginBackground.webp' },
-    { id: 'kestari', nama: 'Kestari', bgImg: '/assets/LoginBackground.webp' },
-    // ... divisi lainnya
-  ];
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [dataDivisi, setDataDivisi] = useState([])
+  const token = useAuthStore((state) => state.token);
+
+  const getDivisi = useCallback(async () => {
+    setIsLoading(true)
+    try{
+        const response = await axios.get("https://api.baktiunand2026.com/api/divisi", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        setDataDivisi(response.data.data)
+        console.log("Data divisi berhasil di fecth")
+    } catch (error){
+      alert("Error dalam mengambil data divisi")
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [token]) 
+
+  useEffect(() => {
+    getDivisi();
+  }, [getDivisi]);
 
   return (
-    // PERBAIKAN RESPONSIVE: p-4 pt-24 (mobile) lalu md:p-10 md:pt-10 (desktop). lg:pl-28 agar aman dari sidebar.
-    <div className="min-h-screen bg-[#F8F9FA] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 w-full overflow-x-hidden">
+   <div className="min-h-screen bg-[#F8F9FA] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 w-full overflow-x-hidden">
       
-      {/* PERBAIKAN: text-3xl di mobile, text-4xl di desktop. Margin bawah sedikit dikurangi di mobile */}
       <h1 className="text-3xl md:text-4xl font-black text-center text-[#133F25] mb-8 md:mb-12">
         Data Panitia
       </h1>
       
+      {/* Jika masih loading, tampilkan tulisan ini */}
+      {isLoading && (
+        <div className="text-center font-bold text-gray-500 animate-pulse">
+          Memuat data divisi...
+        </div>
+      )}
+      
       {/* Grid Cards */}
       <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-6xl mx-auto">
-        {divisiList.map((divisi) => (
+        {/* 🔥 3. MAP DATA ASLI DARI API */}
+        {!isLoading && dataDivisi.map((divisi) => (
           <Link 
             key={divisi.id}
-            to={`/panitia/data-panitia/${divisi.id}`} // <--- URL Tujuan Dinamis
-            // PERBAIKAN: w-full sm:w-64 agar di HP tampil penuh (full width), di layar agak besar kembali jadi w-64
+            to={`/panitia/data-panitia/${divisi.id}`} 
+            state={{namaDivisi: divisi.nama_divisi}}
             className="relative w-full sm:w-64 h-28 rounded-2xl overflow-hidden group shadow-md hover:shadow-xl transition-all"
           >
-            {/* Background Image Hitam Transparan */}
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all z-10"></div>
             
             <img 
-              src={divisi.bgImg} 
-              alt={divisi.nama} 
+              // Beri gambar default jika backend tidak ngirim foto background
+              src={bgDivisi} 
+              alt={divisi.nama_divisi} 
               className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
             />
             
-            {/* Text Judul Divisi */}
             <div className="absolute inset-0 z-20 flex items-center justify-center">
-              {/* PERBAIKAN: text-2xl di mobile, text-3xl di desktop */}
-              <h2 className="text-white text-2xl md:text-3xl font-black tracking-widest uppercase drop-shadow-lg">
-                {divisi.nama}
+              <h2 className="text-white text-xl md:text-2xl font-black tracking-widest uppercase drop-shadow-lg text-center px-2">
+                {/* Sesuaikan dengan nama properti dari backend (biasanya nama_divisi) */}
+                {divisi.nama_divisi || divisi.nama} 
               </h2>
             </div>
-            
           </Link>
         ))}
+
+        {/* Jika data kosong setelah loading */}
+        {!isLoading && dataDivisi.length === 0 && (
+           <div className="text-center font-bold text-gray-500 w-full mt-10">
+              Belum ada data divisi.
+           </div>
+        )}
       </div>
     </div>
   );
