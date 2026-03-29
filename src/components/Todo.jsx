@@ -17,7 +17,7 @@ function Todo({ tasks = [], onToggle }) {
 
   // STATE LOKAL UNTUK OPTIMISTIC UI
   const [localTasks, setLocalTasks] = useState([]);
-
+  console.log(role)
   // Sinkronkan data dari parent (Dashboard) ke state lokal
   useEffect(() => {
     setLocalTasks(tasks);
@@ -59,7 +59,7 @@ function Todo({ tasks = [], onToggle }) {
           <h2 className="text-2xl md:text-4xl text-center w-full font-bold text-[#E6e6e6] z-10">
             TO-DO 
           </h2>
-          {(role === 'koordinator' || role === 'INTI') && isDetailedView && (
+          {(role === 'PRESIDIUM' || role === 'INTI') && isDetailedView && (
             <button 
               onClick={handleShowTodo} 
               className="absolute right-3 md:right-6 z-20 active:scale-95 flex justify-center gap-1 md:gap-2 items-center bg-[#397F22] text-[#e6e6e6] hover:bg-[#397F22]/80 font-bold py-1.5 px-3 md:py-2 md:min-w-[120px] md:px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-xs md:text-base"

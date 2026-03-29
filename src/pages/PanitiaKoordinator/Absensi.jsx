@@ -87,6 +87,7 @@ export default function Absensi() {
           <div className="flex items-center gap-2 mt-2">
             <div className="w-5 h-5 bg-[#67E8F9] rounded-sm"></div>
             <span className="font-bold text-sm md:text-base">{user.divisi.nama_divisi}</span>
+            {console.log(role)}
           </div>
         </div>
 

@@ -14,7 +14,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
   
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
-  const divisiId = useAuthStore((state) => state.user.divisi_id);
+  const divisiId = useAuthStore((state) => state.user?.divisi_id);
   const [isLoading, setIsLoading] = useState(false);
   const token = useAuthStore((state) => state.token); // Ambil token dari Zustand Store
 

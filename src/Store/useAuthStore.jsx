@@ -10,7 +10,7 @@ const useAuthStore = create(
       // 1. BARANG (State/Data)
       token: null,
       tempToken: null, // Ini buat nyimpen token sementara saat user harus ganti password dulu
-      user: null,
+      user: {},
       role: null,
       
       // 2. PETUGAS (Actions/Fungsi)
