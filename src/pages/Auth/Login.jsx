@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 // Ikon dari react-icons (Heroicons set)
 import { FiBookOpen, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -10,6 +11,7 @@ import useAuthStore from '../../Store/useAuthStore';
 import SuccessPopUp from '../../components/ui/SuccessPopUp';
 
 function Login() {
+  React.useEffect(() => { document.title = "Login | Bakti Unand 2026"; }, []);
   const [showPassword, setShowPassword] = useState(false);
 
   // KODE WARNA SPESIFIK UNAND (Bisa dipindah ke index.css @theme nantinya)

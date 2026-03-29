@@ -10,6 +10,7 @@ import useAuthStore from '../../Store/useAuthStore';
 import SuccessPopUp from '../../components/ui/SuccessPopUp';
 
 function ResetPassword() {
+  React.useEffect(() => { document.title = "Lupa Password | Bakti Unand 2026"; }, []);
 
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);

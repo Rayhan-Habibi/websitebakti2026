@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'; // 🔥 Wajib pakai Link buat navigasi 
 import loginBg from '../../assets/LoginBackground.webp'; // 🔥 Impor gambar sesuai path yang kamu kasih
 
 export default function LandingPage() {
+  React.useEffect(() => { document.title = "Bakti Unand 2026"; }, []);
   return (
     // 1. UTAMA: BUNGKUS SELURUH LAYAR & TERAPKAN BG DARI GAMBAR LOGIN
     <div

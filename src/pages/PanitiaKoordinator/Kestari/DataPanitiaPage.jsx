@@ -5,6 +5,7 @@ import api from '../../../config/api';
 import bgDivisi from "../../../assets/DivisiBackground.webp"
 
 export default function DataPanitiaPage() {
+  React.useEffect(() => { document.title = "Data Panitia | Bakti Unand 2026"; }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [dataDivisi, setDataDivisi] = useState([]);
   const token = useAuthStore((state) => state.token);

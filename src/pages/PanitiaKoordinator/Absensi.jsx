@@ -50,7 +50,7 @@ export default function Absensi() {
   }, [token]); 
 
   useEffect(() => {
-    document.title = "Absensi Panitia";
+    document.title = "Absensi | Bakti Unand 2026";
     fetchAbsensiData(); 
   }, [fetchAbsensiData]);
 

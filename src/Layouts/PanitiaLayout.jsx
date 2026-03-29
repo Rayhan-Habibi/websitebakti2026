@@ -21,7 +21,7 @@ function PanitiaLayout() {
         <div className="flex-grow">
           <Outlet />
         </div>
-        <footer className="w-full text-center py-4 bg-[#F1F3F4] text-[#133F25]/60 mt-auto md:pl-24 flex-shrink-0">
+        <footer className="w-full border-t-2 border-gray-400 text-center py-1 bg-[#F1F3F4] text-[#133F25]/60 mt-auto md:pl-24 flex-shrink-0">
           <span className="text-xs font-bold tracking-wider opacity-60">
             © 2026 Developed by Neo Telemetri × Bakti UNAND.
           </span>

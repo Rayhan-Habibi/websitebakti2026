@@ -8,7 +8,8 @@ import api from '../../../config/api';
 import CancelModal from '../../../components/ui/CancelModal';
 
 export default function DetailDivisiPage() {
-  const { namaDivisi } = useParams(); 
+  const { namaDivisi } = useParams();
+  React.useEffect(() => { document.title = `Data Panitia ${namaDivisi || ''} | Bakti Unand 2026`; }, [namaDivisi]); 
   const [panitiaData, setPanitiaData] = useState([]);
   const token = useAuthStore((state) => state.token);
   const [isLoading, setIsLoading] = useState(false);

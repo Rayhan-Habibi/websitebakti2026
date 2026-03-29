@@ -40,7 +40,7 @@ function Dashboard() {
   }, [divisiId, token]);
 
   useEffect(() => {
-    document.title = "Dashboard Panitia";
+    document.title = "Dashboard | Bakti Unand 2026";
     fetchDashboardData();
   }, [fetchDashboardData]); 
 

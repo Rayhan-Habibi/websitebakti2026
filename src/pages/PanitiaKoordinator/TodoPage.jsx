@@ -32,7 +32,7 @@ export default function TodoPage() {
   }, [divisiId, token]);
 
   useEffect(() => {
-    document.title = "To-Do List Panitia";
+    document.title = "To-Do List | Bakti Unand 2026";
     fetchTodoData(); 
   }, [fetchTodoData]); 
 
