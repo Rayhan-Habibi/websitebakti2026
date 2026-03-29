@@ -7,7 +7,7 @@ import baktiLogoText from "../../assets/BaktiLogoText.webp"
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../Store/useAuthStore';
-import SuccessPopUp from '../../components/SuccessPopUp';
+import SuccessPopUp from '../../components/ui/SuccessPopUp';
 
 function ResetPassword() {
 
@@ -160,7 +160,7 @@ function ResetPassword() {
                       <button
                         type="submit"
                         disabled={isLoading || newPassword !== confirmPassword || newPassword.length < 6}
-                        className={`w-full py-4 text-white text-xl font-bold uppercase rounded-xl transition shadow-lg flex justify-center items-center gap-3 ${
+                        className={`w-full mt-8 py-4 text-white text-xl font-bold uppercase rounded-xl transition shadow-lg flex justify-center items-center gap-3 ${
                             isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:brightness-110 active:scale-[0.98]'
                         }`}
                         style={{ backgroundColor: unandColors.darkGreen }}
@@ -176,22 +176,13 @@ function ResetPassword() {
                             <span>Memproses...</span>
                             </>
                         ) : (
-                            <span>Masuk</span>
+                            <span>Ubah Password</span>
                         )}
                         </button>
                     </div>
                     
         
-                    {/* Tombol MASUK (Warna Hijau Tua Unand) */}
-                    <button
-                      type="submit"
-                      className="w-full py-4 text-white text-xl font-bold uppercase rounded-xl transition hover:brightness-110 active:scale-[0.98] shadow-lg"
-                      style={{ backgroundColor: unandColors.darkGreen }}
-                      onClick={handlePasswordChange}
-                      enabled={!isLoading && newPassword === confirmPassword && newPassword.length >= 6}
-                    >
-                      Ubah Password
-                    </button>
+                    
                   </form>
                 </div>
               </div>

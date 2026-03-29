@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 import { FiBookOpen, FiEye, FiEyeOff } from 'react-icons/fi';
 import loginBg from "../../assets/LoginBackground.webp"
 import baktiLogoText from "../../assets/BaktiLogoText.webp"
-import axios from 'axios';
+import api from '../../config/api';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../Store/useAuthStore';
-import SuccessPopUp from '../../components/SuccessPopUp';
+import SuccessPopUp from '../../components/ui/SuccessPopUp';
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +36,7 @@ function Login() {
     setErrorMsg('');
 
     try {
-      const response = await axios.post('https://api.baktiunand2026.com/api/auth/login', {
+      const response = await api.post('/api/auth/login', {
         username: username,
         password: password
       })
@@ -64,7 +64,7 @@ function Login() {
             setTempToken(data.token); // Simpan temp token di Zustand
           }
           alert("Silahkan ubah password Anda terlebih dahulu.");
-          navigate('/panitia/ubah-password');
+          navigate('/lupa-password');
         } else if (status === 401) {
           alert("Username atau password salah. Silahkan coba lagi.");
           setErrorMsg("Username atau password salah. Silahkan coba lagi.");
@@ -117,23 +117,9 @@ function Login() {
             bagi mahasiswa baru Universitas Andalas.
           </p>
         </div>
-
-        {/* Kotak Guidebook (Dengan efek Glassmorphism tipis) */}
-        <div className="border border-[#E6E6E6] bg-white/30 rounded-2xl p-8 max-w-xl space-y-6">
-          <div className="flex items-center gap-3 text-slate-300 uppercase tracking-wider font-semibold">
-            <FiBookOpen className="text-2xl" />
-            <span>Guidebook Penggunaan Website</span>
-          </div>
-          
-          {/* Tombol UNDER DEVELOPMENT */}
-          <div className="bg-[#91C397]/30 rounded-xl p-6 text-center border-1 border-white">
-            <span className="text-2xl font-bold uppercase text-white/60 tracking-widest">
-              Under Development
-            </span>
-          </div>
-        </div>
       </div>
 
+       
       {/* ----------------- SECTOR KANAN: KARTU LOGIN ----------------- */}
       <div className="flex items-center justify-center p-6 md:p-12">
         {/* Kartu Login Putih/Abu-abu Terang */}
@@ -185,14 +171,7 @@ function Login() {
             </div>
 
             {/* Lupa Kata Sandi */}
-            <div className="text-right">
-              <Link
-                to="/lupa-password"
-                className="text-sm font-semibold text-[#1E4D31] hover:text-[#2ECC71] transition"
-              >
-                Lupa Kata Sandi?
-              </Link>
-            </div>
+            
 
             {/* Tombol MASUK (Warna Hijau Tua Unand) */}
             <button
@@ -217,6 +196,11 @@ function Login() {
                 <span>Masuk</span>
               )}
             </button>
+            <div className="w-full text-center mt-6">
+              <span className="text-[#1E4D31]/70 text-xs font-bold tracking-wider">
+                © 2026 Developed by Neo Telemetri × Bakti UNAND.
+              </span>
+            </div>
           </form>
         </div>
       </div>

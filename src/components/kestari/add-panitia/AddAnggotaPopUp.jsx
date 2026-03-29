@@ -1,7 +1,7 @@
-import axios from 'axios';
 import React, { useState } from 'react';
-import { FiArrowLeft, FiLoader } from 'react-icons/fi'; // Tambah icon loader
+import { FiArrowLeft, FiLoader, FiChevronDown } from 'react-icons/fi';
 import useAuthStore from '../../../Store/useAuthStore';
+import api from '../../../config/api';
 
 export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, onRefresh }) {
   const [nama, setNama] = useState('');
@@ -18,17 +18,13 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
     setIsLoading(true);
     
     try {
-      await axios.post(`https://api.baktiunand2026.com/api/panitia`, {
+      await api.post('/api/panitia', {
         nama: nama,
         nim: nim,
-        divisi_id: divisiId, // PASTIKAN komponen induk melempar ID ini ke modal ya!
+        divisi_id: divisiId,
         role: role,
         fakultas: fakultas
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
       });
-      
-      console.log("Data panitia sukses dikirim");
 
       // 🔥 INI DIA SIHIRNYA: Panggil onRefresh setelah data sukses masuk!
       if (onRefresh) onRefresh();
@@ -43,11 +39,11 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
       onSuccess();
 
     } catch (error) {
-      const status = error.response.status
+      const status = error.response?.status;
       if (status === 403){
         alert("Hanya kestari yang dapat mengisi form panitia");
       } else{
-         console.log("Ada error pls: " + error);
+        console.error("Error adding panitia:", error);
         alert("Gagal menambahkan data panitia. Cek koneksimu.");
       }
      
@@ -116,14 +112,14 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
               type="text" 
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50"
+              className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2.5 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50"
               required
             />
           </div>
 
-          {/* INPUT NIM (ID diperbaiki jadi 'nim') */}
+          {/* INPUT NIM */}
           <div className="w-full">
-            <label htmlFor="nim" className="block text-2xl font-bold text-[#133F25] mb-2">
+            <label htmlFor="nim" className="block text-xl font-bold text-[#133F25] mb-2">
               NIM
             </label>
             <input 
@@ -131,24 +127,45 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
               type="number" 
               value={nim}
               onChange={(e) => setNim(e.target.value)}
-              className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50"
+              className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2.5 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50"
               required
             />
           </div>
 
           {/* INPUT FAKULTAS */}
           <div className="w-full pb-6">
-            <label htmlFor="fakultas" className="block text-2xl font-bold text-[#133F25] mb-2">
+            <label htmlFor="fakultas" className="block text-xl font-bold text-[#133F25] mb-2">
               Fakultas
             </label>
-            <input 
-              id="fakultas"
-              type="text" 
-              value={fakultas}
-              onChange={(e) => setFakultas(e.target.value)}
-              className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50"
-              required
-            />
+            <div className="relative w-full">
+              <select 
+                id="fakultas"
+                value={fakultas}
+                onChange={(e) => setFakultas(e.target.value)}
+                className="w-full bg-white border-2 border-[#133F25] rounded-2xl px-4 py-2.5 text-md font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#388E3C]/50 appearance-none pr-10 cursor-pointer"
+                required
+              >
+                <option value="" disabled hidden>Pilih Fakultas</option>
+                <option value="Fakultas Hukum">Fakultas Hukum</option>
+                <option value="Fakultas Pertanian">Fakultas Pertanian</option>
+                <option value="Fakultas Kedokteran">Fakultas Kedokteran</option>
+                <option value="Fakultas Matematika dan Ilmu Pengetahuan Alam">Fakultas Matematika dan Ilmu Pengetahuan Alam</option>
+                <option value="Fakultas Ekonomi dan Bisnis">Fakultas Ekonomi dan Bisnis</option>
+                <option value="Fakultas Peternakan">Fakultas Peternakan</option>
+                <option value="Fakultas Ilmu Budaya">Fakultas Ilmu Budaya</option>
+                <option value="Fakultas Ilmu Sosial dan Politik">Fakultas Ilmu Sosial dan Politik</option>
+                <option value="Fakultas Teknik">Fakultas Teknik</option>
+                <option value="Fakultas Teknologi dan Informasi">Fakultas Teknologi dan Informasi</option>
+                <option value="Fakultas Farmasi">Fakultas Farmasi</option>
+                <option value="Fakultas Teknologi Pertanian">Fakultas Teknologi Pertanian</option>
+                <option value="Fakultas Kesehatan Masyarakat">Fakultas Kesehatan Masyarakat</option>
+                <option value="Fakultas Keperawatan">Fakultas Keperawatan</option>
+                <option value="Fakultas Kedokteran Gigi">Fakultas Kedokteran Gigi</option>
+              </select>
+              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-[#133F25]">
+                <FiChevronDown className="text-2xl font-bold" />
+              </div>
+            </div>
           </div>
           
           {/* Trik Submit Tersembunyi */}

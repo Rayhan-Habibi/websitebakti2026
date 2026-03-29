@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
 import RekapAbsenPopUp from './RekapAbsenPopUp'; 
-import CancelIcon from './Icons/CancelIcon';
-import EditIcon from './Icons/EditIcon';
-import CancelModal from './CancelModal';
+import CancelIcon from '../ui/Icons/CancelIcon';
+import EditIcon from '../ui/Icons/EditIcon';
+import CancelModal from '../ui/CancelModal';
 
 // 1. FUNGSI PEMBANTU FORMATTING (Logika Frontend)
 
@@ -23,8 +23,8 @@ function RekapAbsen({ data = [], onRefresh }) {
   const [selectedKegiatanForEdit, setSelectedKegiatanForEdit] = useState("");
   const [dataId, setDataId] = useState(null);
   const [namaKegiatan, setNamaKegiatan] = useState("")
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  console.log(data)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
 
 
 

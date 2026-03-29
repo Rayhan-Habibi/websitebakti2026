@@ -1,13 +1,13 @@
-import { useState, useEffect, use } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
-import baktiLogo from '../assets/Icons/BaktiLogo.webp';
-import QrIcon from './Icons/QrIcon';
-import TodoIcon from './Icons/TodoIcon';
-import DashboardIcon from './Icons/DashboardIcon';
-import LogoutIcon from './Icons/LogoutIcon';
-import DataPanitiaIcon from './Icons/DataPanitiaIcon';
-import useAuthStore from '../Store/useAuthStore';
+import baktiLogo from '../../assets/Icons/BaktiLogo.webp';
+import QrIcon from '../ui/Icons/QrIcon';
+import TodoIcon from '../ui/Icons/TodoIcon';
+import DashboardIcon from '../ui/Icons/DashboardIcon';
+import LogoutIcon from '../ui/Icons/LogoutIcon';
+import DataPanitiaIcon from '../ui/Icons/DataPanitiaIcon';
+import useAuthStore from '../../Store/useAuthStore';
 
 function Sidebar() {
   const [activeMenu, setActiveMenu] = useState('absensi');
@@ -61,15 +61,6 @@ function Sidebar() {
       }
   }
 
-  //Fetch user data
-  const fetchUserData = useAuthStore((state) => state.fetchUserData);
-  const user = useAuthStore((state) => state.user);
-
-  useEffect(() => {
-    if (!user) {
-      fetchUserData();
-    }
-  }, [fetchUserData, user]);
 
   return (
     <>
@@ -77,7 +68,7 @@ function Sidebar() {
       {/* Perhatikan penambahan class md:... untuk mode desktop */}
       <aside className="fixed top-0 left-0 z-50 bg-sidebar-bg text-white shadow-2xl transition-all duration-300 ease-in-out 
         w-full h-16 flex flex-row items-center px-4 justify-between 
-        md:h-screen md:flex-col md:py-6 md:w-15 md:hover:w-72 md:justify-start md:px-0 group"
+        md:h-screen md:flex-col md:py-6 md:w-15 md:hover:w-60 md:justify-start md:px-0 group"
       >
         
         {/* SPASI KIRI DI MOBILE (Agar Logo bisa persis di tengah) */}
@@ -85,12 +76,23 @@ function Sidebar() {
 
         {/* 1. LOGO SECTION */}
         {/* Di mobile: tinggi menyesuaikan navbar. Di desktop: tinggi 20 dan ada margin bawah */}
-        <div className="flex justify-center items-center flex-shrink-0 md:h-20 md:mb-12">
+        <div 
+          onClick={() => navigate('/')}
+          className="flex justify-center items-center md:group-hover:justify-start md:group-hover:px-5 flex-shrink-0 md:h-20 md:mb-12 transition-all duration-300 cursor-pointer overflow-hidden w-full"
+        >
           <img 
             src={baktiLogo} 
             alt="Logo BAKTI" 
-            className="w-10 h-10 object-contain transition-transform md:group-hover:scale-110" 
+            className="w-10 h-10 object-contain transition-transform md:group-hover:scale-110 flex-shrink-0" 
           />
+          <div className="w-0 opacity-0 overflow-hidden transition-all duration-300 md:group-hover:w-auto md:group-hover:opacity-100 md:group-hover:ml-4 hidden md:flex flex-col">
+            <span className="font-black text-[17px] whitespace-nowrap text-white tracking-wider leading-none">
+              BAKTI UNAND
+            </span>
+            <span className="font-bold text-[13px] whitespace-nowrap text-[#91C397] tracking-widest mt-1">
+              2026
+            </span>
+          </div>
         </div>
 
         {/* TOMBOL HAMBURGER DI MOBILE (Berada di ujung kanan) */}
@@ -104,7 +106,7 @@ function Sidebar() {
         </div>
 
         {/* 2. NAVIGATION MENU SECTION (HANYA MUNCUL DI DESKTOP) */}
-        <nav className="hidden md:flex flex-col flex-grow space-y-2 px-1 w-full">
+        <nav className="hidden md:flex flex-col flex-grow space-y-6 px-1 w-full">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentRoute === item.id;
@@ -127,7 +129,7 @@ function Sidebar() {
                   {isPlaceholder ? (
                     <div className="h-7 w-full rounded-md bg-sidebar-placeholder opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100 flex-shrink-0" />
                   ) : (
-                    <span className="text-2xl font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
+                    <span className="text-md font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
                       {item.name}
                     </span>
                   )}
@@ -157,7 +159,7 @@ function Sidebar() {
                 <LogoutIcon />
               )}
             </div>
-            <span className="text-2xl font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
+            <span className="text-md font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
               {isLoggingOut ? 'Keluar...' : 'Logout'}
             </span>
           </div>

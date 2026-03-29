@@ -1,10 +1,10 @@
-import React, {useEffect, useCallback, useState} from 'react';
-import Todo from '../../components/Todo';
-import MissedOut from '../../components/MissedOut';
-import FinishedTodo from '../../components/FinishedTodo'; 
+import React, { useEffect, useCallback, useState } from 'react';
+import Todo from '../../components/todo/Todo';
+import MissedOut from '../../components/todo/MissedOut';
+import FinishedTodo from '../../components/todo/FinishedTodo'; 
 import useAuthStore from '../../Store/useAuthStore';
-import axios from 'axios';
-import RefreshIcon from '../../components/RefreshIcon';
+import api from '../../config/api';
+import RefreshIcon from '../../components/ui/RefreshIcon';
 
 export default function TodoPage() {
   const userData = useAuthStore((state) => state.user);
@@ -12,21 +12,15 @@ export default function TodoPage() {
   const token = useAuthStore((state) => state.token);
   
   const [todos, setTodos] = useState([]);
-  const [kegiatan, setKegiatan] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchDashboardData = useCallback(async () => {
+  // FIX: Renamed from fetchDashboardData → fetchTodoData
+  const fetchTodoData = useCallback(async () => {
     if (!divisiId) return;
     setIsRefreshing(true); 
 
     try {
-      // 🔥 PERBAIKAN: Langsung tembak axios biasa, buang Promise.all
-      const responseTodo = await axios.get(`https://api.baktiunand2026.com/api/todos/${divisiId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Sekarang responseTodo udah murni objek dari Axios
-      console.log("Data diterima:", responseTodo.data.data);
+      const responseTodo = await api.get(`/api/todos/${divisiId}`);
       setTodos(responseTodo.data.data || []);
       
     } catch (error) {
@@ -35,12 +29,12 @@ export default function TodoPage() {
     } finally {
       setIsRefreshing(false); 
     }
-  }, [divisiId, token])
+  }, [divisiId, token]);
 
   useEffect(() => {
     document.title = "To-Do List Panitia";
-    fetchDashboardData(); 
-  }, [fetchDashboardData]); 
+    fetchTodoData(); 
+  }, [fetchTodoData]); 
 
   const handleToggleTask = async (id, currentStatus) => {
     const newStatus = !currentStatus;
@@ -51,45 +45,26 @@ export default function TodoPage() {
     ));
 
     try {
-      await axios.patch(`https://api.baktiunand2026.com/api/todos/${id}/status`, 
-        { is_done: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.patch(`/api/todos/${id}/status`, { is_done: newStatus });
     } catch (error) {
       setTodos(backupTodos);
       alert("Gagal memindahkan tugas. Cek koneksi internetmu.");
     }
   };
 
-  // --- 1. DATA NORMALIZATION (Menyeragamkan Format) ---
-  // Kita satukan 'todos' dan 'kegiatan' jadi satu array raksasa yang seragam
+  // --- DATA NORMALIZATION ---
   const normalizedData = [
-    // Format dari array Todos
     ...todos.map(item => ({
-      ...item, // Bawa semua data aslinya
-      tipe_item: 'todo', // Penanda biar kita tahu ini asalnya darimana
+      ...item,
+      tipe_item: 'todo',
       judul_tugas: item.tugas, 
       unique_id: `todo-${item.id}`,
       tanggal_mulai: item.start_date,
       tanggal_selesai: item.deadline,
     })),
-    // Format dari array Kegiatan
-    ...kegiatan.map(item => ({
-      ...item,
-      tipe_item: 'kegiatan',
-      // Kalau backend kegiatan pakai 'nama_acara', kita paksa jadi 'judul_tugas'
-      judul_tugas: item.title || item.tugas || 'Tanpa Judul', 
-      unique_id: `kegiatan-${item.id}`,
-      // Sesuaikan key tanggal dari API Kegiatan (misal: 'tanggal' dan 'tanggal_berakhir')
-      tanggal_mulai: item.date || item.start_date, 
-      tanggal_selesai: item.tanggal_berakhir || item.deadline || item.tanggal, 
-      // Tambahkan is_done manual jika backend Kegiatan tidak punya fitur centang
-      is_done: item.is_done || false, 
-    }))
   ];
 
-
-  // --- 2. LOGIKA PEMISAHAN DATA ---
+  // --- LOGIKA PEMISAHAN DATA ---
   const today = new Date(); 
   today.setHours(0, 0, 0, 0); 
 
@@ -97,22 +72,17 @@ export default function TodoPage() {
   const missedTodos = [];
   const finishedTodos = []; 
 
-  // Sekarang kita ngeloop dari data yang sudah diseragamkan
   normalizedData.forEach(task => {
-    
-    // 1. Cek Finished
     if (task.is_done === true || task.is_done === 1) {
       finishedTodos.push(task);
       return; 
     }
     
-    // 2. Kalau tidak punya tanggal selesai, masuk Active
     if (!task.tanggal_selesai) {
       activeTodos.push(task);
       return;
     }
 
-    // 3. Hitung Selisih Hari pakai key yang sudah dinormalisasi
     const taskEndDate = new Date(task.tanggal_selesai);
     taskEndDate.setHours(0, 0, 0, 0); 
 
@@ -121,12 +91,7 @@ export default function TodoPage() {
 
     if (diffDays < 0) {
       task.alert = "Tenggat Terlewati";
-      // Misal: Kegiatan Rapat kalau udah lewat tanggalnya, anggap aja Finished
-      if (task.tipe_item === 'kegiatan') {
-         finishedTodos.push(task);
-      } else {
-         missedTodos.push(task);
-      }
+      missedTodos.push(task);
     } else {
       if (diffDays <= 3) {
         task.alert = `Sisa ${diffDays} Hari Lagi`;
@@ -140,14 +105,14 @@ export default function TodoPage() {
       <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#014421]">To-Do List</h1>
       
       <div className="z-20 pointer-events-auto">
-        <RefreshIcon fetchDashboardData={fetchDashboardData} isRefreshing={isRefreshing} />
+        <RefreshIcon fetchDashboardData={fetchTodoData} isRefreshing={isRefreshing} />
       </div>
       
       <div className="flex flex-col gap-10">
         
         <Todo 
           tasks={activeTodos} 
-          onRefresh={fetchDashboardData} 
+          onRefresh={fetchTodoData} 
           onToggle={handleToggleTask} 
         />
         

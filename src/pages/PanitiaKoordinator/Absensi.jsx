@@ -1,51 +1,75 @@
 import React, { useEffect, useCallback } from 'react';
-import RekapAbsen from '../../components/RekapAbsen';
-import IndikatorDivisi from '../../components/IndikatorDivisi';
+import RekapAbsen from '../../components/absensi/RekapAbsen';
+import IndikatorDivisi from '../../components/dashboard/IndikatorDivisi';
 import useAuthStore from '../../Store/useAuthStore';
 import { QRCodeSVG } from 'qrcode.react';
-import axios from 'axios';
-import PieChartAbsen from '../../components/PieChartAbsen';
+import api from '../../config/api';
+import PieChartAbsen from '../../components/dashboard/PieChartAbsen';
 
 export default function Absensi() {
 
   const role = useAuthStore((state) => state.role);
-  const qrCode = useAuthStore((state) => state.user.qr_token);
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
+  const fetchUserData = useAuthStore((state) => state.fetchUserData);
   
   const [chartData, setChartData] = React.useState({});
   const [absenKegiatan, setAbsenKegiatan] = React.useState([]);
 
-  const fetchAbsensiData = useCallback(async () => {
-    try {
-      // 🔥 PERBAIKAN: Cukup panggil API sekali saja di dalam Promise.all
-      const [responseStatistik, responseAbsen] = await Promise.all([
-        axios.get(`https://api.baktiunand2026.com/api/absensi/statistik`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`https://api.baktiunand2026.com/api/absensi/rekap-kegiatan`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-      ]);
-
-      console.log("Data chart diterima");
-      console.log("Data rekap kegiatan diterima");
-
-      // 🔥 PERBAIKAN: Ambil data dari responseStatistik, bukan response yang error tadi
-      setChartData(responseStatistik.data.data);
-      setAbsenKegiatan(responseAbsen.data.data);
-
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      // alert("Gagal memuat data Dashboard. Silakan coba lagi."); // Boleh dinyalakan kalau mau
+  // Pastikan user data sudah di-fetch
+  useEffect(() => {
+    if (!user || !user.nama) {
+      fetchUserData();
     }
-    // 🔥 PERBAIKAN: Hapus chartData dari array di bawah agar tidak terjadi Infinite Loop
+  }, [user, fetchUserData]);
+
+  const fetchAbsensiData = useCallback(async () => {
+    // Menggunakan Promise.allSettled agar jika satu gagal, yang lain tetap jalan
+    const [resultStatistik, resultAbsen] = await Promise.allSettled([
+      api.get('/api/absensi/statistik'),
+      api.get('/api/absensi/rekap-kegiatan'),
+    ]);
+
+    // Handle Endpoint 1: Statistik
+    if (resultStatistik.status === 'fulfilled') {
+      const response = resultStatistik.value;
+      setChartData(response.data.data || response.data);
+      console.log("Chart Data Murni dari API: ", response.data);
+    } else {
+      console.error("❌ Gagal menarik API Statistik Absensi:", resultStatistik.reason);
+    }
+
+    // Handle Endpoint 2: Rekap Kegiatan
+    if (resultAbsen.status === 'fulfilled') {
+      const response = resultAbsen.value;
+      setAbsenKegiatan(response.data.data || []);
+    } else {
+      console.error("❌ Gagal menarik API Rekap Kegiatan Absensi:", resultAbsen.reason);
+    }
+
   }, [token]); 
 
   useEffect(() => {
     document.title = "Absensi Panitia";
     fetchAbsensiData(); 
   }, [fetchAbsensiData]);
+
+  // Guard: Jangan render konten sampai data user sudah lengkap
+  const isUserLoaded = user && user.nama;
+
+  if (!isUserLoaded) {
+    return (
+      <div className="min-h-screen bg-[#F1F3F4] p-3 pt-24 md:p-5 md:pt-5 lg:pl-24 font-sans text-[#133F25] w-full overflow-x-hidden flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <svg className="animate-spin h-10 w-10 text-[#133F25]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span className="font-bold text-lg text-[#133F25]">Memuat data...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F1F3F4] p-3 pt-24 md:p-5 md:pt-5 lg:pl-24 font-sans text-[#133F25] w-full overflow-x-hidden">
@@ -56,7 +80,7 @@ export default function Absensi() {
           ABSENSI
         </h1>
         <div className="absolute right-2 md:right-6 top-0 md:top-2 z-20 w-fit transform scale-90 md:scale-100 flex-shrink-0">
-          <IndikatorDivisi namaDivisi="MIT" warna="#67E8F9" />
+          <IndikatorDivisi namaDivisi={user?.divisi?.nama_divisi || 'Memuat...'} warna="#67E8F9" />
         </div>
       </div>
 
@@ -68,9 +92,9 @@ export default function Absensi() {
             Qr Absensi Kamu
           </h2>
           <div className="relative p-2 border-4 border-black rounded-2xl mb-8">
-            {qrCode ? (
+            {user?.qr_token ? (
               <QRCodeSVG 
-                value={qrCode.toString()} 
+                value={user.qr_token.toString()} 
                 size={256}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
               />
@@ -82,23 +106,22 @@ export default function Absensi() {
           </div>
           <div className="w-full h-0.5 bg-[#133F25] mb-6"></div>
           <h3 className="text-xl md:text-2xl font-black text-center">
-            {user.nama}
+            {user?.nama}
           </h3>
           <div className="flex items-center gap-2 mt-2">
             <div className="w-5 h-5 bg-[#67E8F9] rounded-sm"></div>
-            <span className="font-bold text-sm md:text-base">{user.divisi.nama_divisi}</span>
-            {console.log(role)}
+            <span className="font-bold text-sm md:text-base">{user?.divisi?.nama_divisi}</span>
           </div>
         </div>
 
         {/* KARTU 2: RIWAYAT ABSENSI */}
         <div className="bg-white rounded-md px-6 py-4 shadow-sm border-2 border-gray-200 flex flex-col items-center">
           <PieChartAbsen 
-            totalKegiatan={user.total_kegiatan}
-            hadir={user.hadir}
-            tidakHadir={user.tidak_hadir}
-            izin={user.izin}
-            sakit={user.sakit}
+            totalKegiatan={chartData?.total_kegiatan}
+            hadir={chartData?.hadir}
+            tidakHadir={chartData?.tidak_hadir}
+            izin={chartData?.izin}
+            sakit={chartData?.sakit}
           />
         </div>
 
@@ -117,9 +140,8 @@ export default function Absensi() {
 
         {/* KARTU 4: Edit Absensi */}
         {
-          role === 'INTI' || role === 'PRESIDIUM' && (
+          (role === 'INTI' || role === 'PRESIDIUM') && (
             <div className='bg-white rounded-md lg:col-span-2 mt-2 shadow-sm border-2 border-gray-200'>
-              {/* 🔥 LEMPAR FUNGSI FETCH SEBAGAI onRefresh */}
               <RekapAbsen 
                 data={absenKegiatan} 
                 onRefresh={fetchAbsensiData} 

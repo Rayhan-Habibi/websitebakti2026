@@ -1,30 +1,35 @@
-import React, { use, useState } from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
-import useAuthStore from '../Store/useAuthStore';
-import axios from 'axios';
-import { FiLoader } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { FiArrowLeft, FiLoader } from 'react-icons/fi';
+import useAuthStore from '../../Store/useAuthStore';
+import api from '../../config/api';
 
 export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
-  // 1. STATE UNTUK INPUT FORMULIR (Dinamis)
   const [type, setType] = useState('Rapat'); 
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [endDate, setEndDate] = useState('');
-  
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
   const divisiId = useAuthStore((state) => state.user?.divisi_id);
   const [isLoading, setIsLoading] = useState(false);
-  const token = useAuthStore((state) => state.token); // Ambil token dari Zustand Store
 
   if (!isOpen) return null;
 
+  // FIX: Extract fungsi reset form agar tidak duplikat
+  const resetForm = () => {
+    setName('');
+    setDate('');
+    setTime('');
+    setPlace('');
+    setDescription('');
+    setEndDate('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-    setIsLoading(true); // Mulai loading saat submit
+    setIsLoading(true);
     const formattedTime = time ? `${time.replace(':', '.')} WIB` : '';
-
 
     const newKegiatan = { 
       nama_acara: name, 
@@ -42,49 +47,20 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
       start_date: date,
       deadline: endDate, 
       divisi_id: divisiId,
-    }
+    };
 
     try {
       if (type === 'Rapat') {
-        await axios.post('https://api.baktiunand2026.com/api/kegiatan', newKegiatan, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Ambil token langsung dari store
-          },
-        });
-        console.log("Menambahkan Kegiatan Baru");
-        // Bersihkan form
-        setName('');
-        setDate('');
-        setTime('');
-        setPlace('');
-        setDescription('');
-        setEndDate('');
-        
-        onSuccess();
+        await api.post('/api/kegiatan', newKegiatan);
       } else if (type === 'Tugas') {
-        await axios.post('https://api.baktiunand2026.com/api/todos', newTodo, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Ambil token langsung dari store
-          },
-        });
-        console.log("Menambahkan Tugas Baru");
-        // Bersihkan form
-        setName('');
-        setDate('');
-        setTime('');
-        setPlace('');
-        setDescription('');
-        setEndDate('');
-        
-        onSuccess();
-
+        await api.post('/api/todos', newTodo);
       }
+      resetForm();
+      onSuccess();
     } catch (error) {
-      console.error("Error adding new Kegiatan:", error);
-      alert("Gagal menambahkan Kegiatan. Silakan coba lagi.");
-      return; // Hentikan eksekusi jika gagal
+      console.error("Error adding new item:", error);
+      alert("Gagal menambahkan. Silakan coba lagi.");
     } finally {
-      // 3. MATIKAN LOADING MESKIPUN SUKSES/GAGAL
       setIsLoading(false);
     }
   };
@@ -107,7 +83,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
         {/* --- BAGIAN TENGAH / KONTEN --- */}
         <form className="py-5 px-10 overflow-y-auto flex-grow space-y-8">
           
-          {/* 3. INPUT JENIS KEGIATAN */}
+          {/* INPUT JENIS KEGIATAN */}
           <div className="w-full">
             <label className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
               Jenis Kegiatan
@@ -138,7 +114,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* 4. INPUT NAMA KEGIATAN */}
+          {/* INPUT NAMA KEGIATAN */}
           <div className="w-full">
             <label htmlFor="name" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
               Nama Kegiatan
@@ -153,11 +129,10 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          {/* 🔥 5. GRID INPUT TANGGAL, PUKUL & TEMPAT */}
+          {/* GRID INPUT TANGGAL, PUKUL & TEMPAT */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
             
             <div className='flex flex-col gap-8'>
-              {/* Input Tanggal Mulai */}
               <div>
                 <label htmlFor="date" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
                   Tanggal Dilaksanakan
@@ -172,7 +147,6 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
                 />
               </div>
 
-              {/* Input Tanggal Berakhir */}
               <div>
                 <label htmlFor="endDate" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
                   Tanggal Berakhir 
@@ -189,10 +163,8 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               </div>
             </div>
 
-            {/* 1. PERBAIKAN: Bungkus dengan Fragment <> </> */}
             {type === 'Rapat' && (
               <>
-                {/* Input Pukul */}
                 <div>
                   <label htmlFor="time" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
                     Pukul
@@ -207,7 +179,6 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
                   />
                 </div>
 
-                {/* Input Tempat */}
                 <div>
                   <label htmlFor="place" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
                     Tempat
@@ -226,7 +197,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
 
           </div>
 
-          {/* 6. INPUT DESKRIPSI */}
+          {/* INPUT DESKRIPSI */}
           <div className="w-full pb-6">
             <label htmlFor="description" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
               Deskripsi (Boleh Dikosongkan)
@@ -247,7 +218,6 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
           <button 
             type="button" 
             onClick={handleSubmit} 
-            // 2. PERBAIKAN: Validasi dinamis! Kalau Rapat minta semua, kalau Tugas minta 3 saja.
             disabled={
               isLoading || 
               !name || 
@@ -268,7 +238,6 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
           </button>
         </div>
       </div>
-      </div>
-
+    </div>
   );
 }

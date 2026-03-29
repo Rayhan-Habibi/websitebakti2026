@@ -1,52 +1,39 @@
 // src/store/useAuthStore.js
-import axios from 'axios';
+import api from '../config/api';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const useAuthStore = create(
-  // persist adalah asisten ajaib yang mem-backup data ke Local Storage otomatis
   persist(
     (set, get) => ({
-      // 1. BARANG (State/Data)
+      // 1. State
       token: null,
-      tempToken: null, // Ini buat nyimpen token sementara saat user harus ganti password dulu
+      tempToken: null,
       user: {},
       role: null,
       
-      // 2. PETUGAS (Actions/Fungsi)
-      // Fungsi ini dipanggil saat login sukses
+      // 2. Actions
       login: (newToken, newRole) => set({ token: newToken, role: newRole }),
 
-      //Jika user harus ubah password dulu
-      setTempToken: (tokenSementara) => set({ 
-        tempToken: tokenSementara 
-      }),
-      clearTempToken: () => set({ 
-        tempToken: null 
-      }),
+      setTempToken: (tokenSementara) => set({ tempToken: tokenSementara }),
+      clearTempToken: () => set({ tempToken: null }),
 
-      //fungsi fetch data user
       fetchUserData: async () => {
-        const token = get().token; // Ambil token dari state
+        const token = get().token;
         if (!token) return;
         try {
-          const response = await axios.get('https://api.baktiunand2026.com/api/auth/me', 
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            })
-            set({ user: response.data.data });
+          const response = await api.get('/api/auth/me');
+          set({ user: response.data.data });
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
       },
 
-      // Fungsi ini dipanggil saat tombol Keluar/Logout ditekan
-      logout: () => set({ token: null, user: null, tempToken: null }),
+      // FIX: Reset user ke {} (bukan null) agar konsisten dengan initial state
+      logout: () => set({ token: null, user: {}, role: null, tempToken: null }),
     }),
     {
-      name: 'bakti-auth-storage', // Ini nama kuncinya pas dicek di Inspect Element > Application > Local Storage
+      name: 'bakti-auth-storage',
     }
   )
 );

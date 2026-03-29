@@ -1,42 +1,38 @@
-import React, { useCallback, useEffect, useState } from 'react'; // Rapikan import useState
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { FiTrash2, FiPlus } from 'react-icons/fi'; 
-import AddAnggotaPopUp from './AddAnggotaPopUp';
-import SuccessPopUp from '../../../components/SuccessPopUp';
+import AddAnggotaPopUp from '../../../components/kestari/add-panitia/AddAnggotaPopUp';
+import SuccessPopUp from '../../../components/ui/SuccessPopUp';
 import useAuthStore from '../../../Store/useAuthStore';
-import axios from 'axios';
-import CancelModal from '../../../components/CancelModal';
+import api from '../../../config/api';
+import CancelModal from '../../../components/ui/CancelModal';
 
 export default function DetailDivisiPage() {
   const { namaDivisi } = useParams(); 
   const [panitiaData, setPanitiaData] = useState([]);
   const token = useAuthStore((state) => state.token);
-  const [isLoading, setIsLoading]  = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
-  const namaDivisiTitle = location.state.namaDivisi;
+  // FIX: Optional chaining agar tidak crash jika user buka URL langsung
+  const namaDivisiTitle = location.state?.namaDivisi || 'Divisi';
   
-  // Modal states
   const [cancelModal, setCancelModal] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-
-  // 🔥 1. STATE BARU: Untuk menyimpan ID panitia mana yang mau dihapus
   const [selectedIdDelete, setSelectedIdDelete] = useState(null);
 
   const fetchPanitiaData = useCallback(async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`https://api.baktiunand2026.com/api/panitia/divisi/${namaDivisi}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPanitiaData(response.data.data);
-      } catch (error) {
-        console.log("Ada error nich: "+ error);
-        alert("Gagal mengambil data panitia");
-      } finally {
-        setIsLoading(false);
-      }
-    }, [namaDivisi, token]); // Jangan lupa token masukin dependency
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/api/panitia/divisi/${namaDivisi}`);
+      setPanitiaData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching panitia data:", error);
+      alert("Gagal mengambil data panitia");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [namaDivisi, token]);
 
   useEffect(() => {
     fetchPanitiaData();
@@ -90,8 +86,7 @@ export default function DetailDivisiPage() {
                     
                     <div className="w-[15%] flex justify-center">
                       <button
-                        onClick={()=> {
-                          // 🔥 2. SIMPAN ID-NYA DULU, BARU BUKA MODAL
+                        onClick={() => {
                           setSelectedIdDelete(item.id); 
                           setCancelModal(true);
                         }}
@@ -113,7 +108,7 @@ export default function DetailDivisiPage() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={() => {
-           setIsAddModalOpen(false); // 🔥 Tadi kamu ketulis true, aku benerin jadi false ya biar modal tambahnya ketutup!
+           setIsAddModalOpen(false);
            setIsSuccessOpen(true);   
         }}
         onRefresh={fetchPanitiaData}
@@ -126,14 +121,13 @@ export default function DetailDivisiPage() {
         message="Anggota Berhasil Ditambahkan!"
       />
 
-      {/* 🔥 3. PANGGIL MODAL DELETE DENGAN PROP YANG LENGKAP */}
       <CancelModal 
         isOpen={cancelModal}
-        onClose={() => setCancelModal(false)} // Kasih tau cara nutupnya
+        onClose={() => setCancelModal(false)}
         message={"Hapus Panitia?"}
         endpoint={"panitia"}
-        id={selectedIdDelete} // Kasih tau ID siapa yang dihapus
-        onRefresh={fetchPanitiaData} // Kasih HT (Walkie Talkie) buat refresh layar!
+        id={selectedIdDelete}
+        onRefresh={fetchPanitiaData}
       />
     </div>
   );
