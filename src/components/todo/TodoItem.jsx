@@ -10,7 +10,7 @@ import { FiClock, FiMapPin, FiAlertCircle, FiCheck } from 'react-icons/fi';
  * - onToggle: function(id, is_done) untuk toggle status
  * - variant: 'active' | 'finished' | 'missed' — mengubah styling
  */
-function TodoItem({ todo, onToggle, variant = 'active' }) {
+function TodoItem({ todo, onToggle, variant = 'active', hideCheckbox = false }) {
   const isFinished = variant === 'finished';
   const isMissed = variant === 'missed';
 
@@ -31,17 +31,19 @@ function TodoItem({ todo, onToggle, variant = 'active' }) {
       <div className="flex items-start gap-4 w-full">
         
         {/* CHECKBOX */}
-        <button 
-          onClick={() => onToggle && onToggle(todo.id, todo.is_done)}
-          className={`w-6 h-6 rounded flex-shrink-0 mt-1 border-2 flex items-center justify-center transition-colors ${
-            todo.is_done 
-              ? 'bg-[#133F25] border-[#133F25]' + (isFinished ? ' hover:bg-gray-400 hover:border-gray-500' : '')
-              : 'border-[#133F25] hover:bg-gray-200'
-          }`}
-          title={isFinished ? 'Batalkan Selesai' : 'Selesaikan Tugas'}
-        >
-          {todo.is_done && <FiCheck className="text-white text-lg font-bold" />}
-        </button>
+        {!hideCheckbox && (
+          <button 
+            onClick={() => onToggle && onToggle(todo.id, todo.is_done)}
+            className={`w-6 h-6 rounded flex-shrink-0 mt-1 border-2 flex items-center justify-center transition-colors ${
+              todo.is_done 
+                ? 'bg-[#133F25] border-[#133F25]' + (isFinished ? ' hover:bg-gray-400 hover:border-gray-500' : '')
+                : 'border-[#133F25] hover:bg-gray-200'
+            }`}
+            title={isFinished ? 'Batalkan Selesai' : 'Selesaikan Tugas'}
+          >
+            {todo.is_done && <FiCheck className="text-white text-lg font-bold" />}
+          </button>
+        )}
         
         {/* KONTEN TEKS */}
         <div className={`flex flex-col w-full ${isFinished ? 'opacity-60' : ''}`}>

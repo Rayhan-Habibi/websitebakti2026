@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 // 🔥 Tambahkan import icon jam, map, dan alert
 import { FiX, FiClock, FiMapPin, FiAlertCircle } from 'react-icons/fi';
+import { getDivisiIcon } from '../../utils/divisiIcons';
 
 // Mapping warna untuk setiap divisi (di luar komponen agar tidak di-realokasi setiap render)
 const DIVISI_COLOR_MAP = {
@@ -27,7 +28,7 @@ export default function Calendar({ viewMode, events }) {
 
   const formattedEvents = events.map((event) => {
     const justDate = event.date || event.start_date ? (event.date || event.start_date).split('T')[0] : '';
-    let bgColor = DIVISI_COLOR_MAP[event.jenis] || '#133F25';
+    let bgColor = event.color_hint || DIVISI_COLOR_MAP[event.jenis] || '#133F25';
 
     // Gabungkan data asli dengan data yang sudah dimodifikasi
     return {
@@ -65,10 +66,12 @@ export default function Calendar({ viewMode, events }) {
   const renderKotakWarna = (eventInfo) => {
     return (
       <div 
-        className="w-5 h-5 rounded-sm shadow-sm"
+        className="w-5 h-5 rounded-sm shadow-sm flex items-center justify-center text-white cursor-not-allowed"
         style={{ backgroundColor: eventInfo.event.backgroundColor }}
         title={eventInfo.event.title}
-      />
+      >
+        {getDivisiIcon(eventInfo.event.extendedProps.jenis, "w-[12px] h-[12px] stroke-[3]")}
+      </div>
     );
   };
 
@@ -97,16 +100,17 @@ export default function Calendar({ viewMode, events }) {
       <div className="mt-8 border-t-2 border-[#133F25] pt-4">
         <p className="text-sm font-extrabold text-[#133F25] mb-2">Ket :</p>
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold text-black uppercase">
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#EF4444]"></div> = Global</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#8B5CF6]"></div> = Pengurus Inti</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#F97316]"></div> = Kestari</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#EC4899]"></div> = Acara</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#FBBF24]"></div> = Cofas</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#1E3A8A]"></div> = MIT</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#14B8A6]"></div> = Konsumsi</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#6366F1]"></div> = MNG</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#78716C]"></div> = Perlengkapan</div>
-          <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded-sm bg-[#4ADE80]"></div> = RNB</div>
+          {Object.entries(DIVISI_COLOR_MAP).map(([divisi, color]) => (
+            <div key={divisi} className="flex items-center gap-1.5 min-w-[120px]">
+              <div 
+                className="w-5 h-5 rounded-sm flex items-center justify-center text-white shadow-md flex-shrink-0"
+                style={{ backgroundColor: color }}
+              >
+                {getDivisiIcon(divisi, "w-[12px] h-[12px] stroke-[3]")}
+              </div>
+              <span className="capitalize">{divisi}</span>
+            </div>
+          ))}
         </div>
       </div>
 

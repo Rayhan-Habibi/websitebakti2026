@@ -4,9 +4,11 @@ import { Html5Qrcode } from 'html5-qrcode';
 import useAuthStore from '../../Store/useAuthStore';
 import SuccessPopUp from '../ui/SuccessPopUp';
 import { FiX, FiLoader, FiChevronDown } from 'react-icons/fi';
+import PieChartAbsen from '../dashboard/PieChartAbsen';
 
-function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan }) {
+function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'edit' }) {
   const [displayedData, setDisplayedData] = useState([]);
+  const [statistikData, setStatistikData] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const token = useAuthStore((state) => state.token);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +24,8 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan }) {
     try {
       const response = await api.get(`/api/absensi/kegiatan/${kegiatanId}`);
       setDisplayedData(response.data.data || []);
-      console.log(displayedData)
+      setStatistikData(response.data.statistik || null);
+      console.log(response.data)
     } catch (error) {
       console.error("Gagal mengambil data absensi:", error);
       setDisplayedData([]);
@@ -59,7 +62,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan }) {
 
   // Inisialisasi & Cleanup Scanner
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || mode === 'chart') return;
 
     const timer = setTimeout(() => {
       const container = document.getElementById(scannerContainerId);
@@ -156,17 +159,37 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan }) {
         {/* --- KONTEN --- */}
         <div className="p-4 md:p-8 overflow-y-auto flex-grow relative">
 
-          <div className="flex justify-center mb-4">
-            <div className="w-[80%] md:w-[40%] lg:w-[30%] bg-[#D9D9D9]/40 border-2 border-[#014421] rounded-xl p-4 flex flex-col items-center justify-center overflow-hidden">
-              <div id={scannerContainerId} className="w-full"></div>
-              {!isScanning && (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <FiLoader className="animate-spin text-3xl text-[#014421] mb-2" />
-                  <span className="font-bold text-sm text-[#014421]">Membuka kamera...</span>
-                </div>
-              )}
+          {/* NEW: PIE CHART RENDER */}
+          {statistikData && (
+            <div className="w-full flex justify-center mb-8 border-b-2 border-gray-100 pb-8">
+               <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
+                 <PieChartAbsen 
+                   totalKegiatan={statistikData.total_peserta || 0}
+                   hadir={statistikData.hadir || 0}
+                   tidakHadir={statistikData.tidak_hadir || 0}
+                   izin={statistikData.izin || 0}
+                   sakit={statistikData.sakit || 0}
+                   isLoading={isLoading}
+                   title={"Statistik\nAcara"}
+                   totalLabel="Total Absen"
+                 />
+               </div>
             </div>
-          </div>
+          )}
+
+          {mode !== 'chart' && (
+            <div className="flex justify-center mb-4">
+              <div className="w-[80%] md:w-[40%] lg:w-[30%] bg-[#D9D9D9]/40 border-2 border-[#014421] rounded-xl p-4 flex flex-col items-center justify-center overflow-hidden">
+                <div id={scannerContainerId} className="w-full"></div>
+                {!isScanning && (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <FiLoader className="animate-spin text-3xl text-[#014421] mb-2" />
+                    <span className="font-bold text-sm text-[#014421]">Membuka kamera...</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="w-full mb-4">
             <label className="block text-md font-bold text-[#133F25] mb-2 tracking-wide">

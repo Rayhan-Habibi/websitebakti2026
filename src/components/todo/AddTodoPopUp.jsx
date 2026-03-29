@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiLoader } from 'react-icons/fi';
 import useAuthStore from '../../Store/useAuthStore';
 import api from '../../config/api';
@@ -12,7 +12,17 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
   const divisiId = useAuthStore((state) => state.user?.divisi_id);
+  const role = useAuthStore((state) => state.role);
   const [isLoading, setIsLoading] = useState(false);
+  const [scope, setScope] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      if (role === 'INTI') setScope('GLOBAL');
+      else if (role === 'PRESIDIUM') setScope('LEADERS');
+      else setScope('');
+    }
+  }, [isOpen, role]);
 
   if (!isOpen) return null;
 
@@ -40,6 +50,10 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
       deskripsi: description,
       divisi_id: divisiId, 
     };
+
+    if (type === 'Rapat' && (role === 'INTI' || role === 'PRESIDIUM')) {
+      newKegiatan.scope = scope;
+    }
 
     const newTodo = {
       tugas: name,
@@ -128,6 +142,30 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               required
             />
           </div>
+
+          {/* INPUT SCOPE (Hanya Rapat & INTI/PRESIDIUM) */}
+          {type === 'Rapat' && (role === 'INTI') && (
+            <div className="w-full">
+              <label htmlFor="scope" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
+                Siapa yang ikut kegiatannya?
+              </label>
+              <select 
+                id="scope"
+                value={scope}
+                onChange={(e) => setScope(e.target.value)}
+                className="w-full bg-white border-2 border-[#133F25]/30 rounded-xl px-4 py-2 text-sm font-semibold text-black focus:border-[#133F25] focus:ring-0"
+              >
+                {role === 'INTI' && (
+                  <>
+                    <option value="GLOBAL">Global</option>
+                    <option value="LEADERS">Inti dan Koordinator</option>
+                    <option value="INTERNAL_INTI">Hanya Inti</option>
+                  </>
+                )}
+                
+              </select>
+            </div>
+          )}
 
           {/* GRID INPUT TANGGAL, PUKUL & TEMPAT */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">

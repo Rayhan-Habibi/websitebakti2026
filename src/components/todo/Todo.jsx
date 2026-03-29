@@ -70,6 +70,7 @@ function Todo({ tasks = [], onToggle }) {
                 todo={todo} 
                 onToggle={onToggle} 
                 variant="active" 
+                hideCheckbox={!isDetailedView}
               />
             ))
           )}

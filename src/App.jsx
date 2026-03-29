@@ -19,7 +19,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={token ? <Navigate to="/panitia/dashboard" replace /> : <Login />} />
-      <Route path="/" element={token ? <Navigate to="/panitia/dashboard" replace /> : <LandingPage />} />
+      <Route path="/" element={<Navigate to={token ? "/panitia/dashboard" : "/login"} replace />} />
       <Route path="lupa-password" element={<ResetPassword/>}/>
 
       <Route element={<ProtectedRoute />}>

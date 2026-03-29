@@ -5,6 +5,7 @@ import FinishedTodo from '../../components/todo/FinishedTodo';
 import useAuthStore from '../../Store/useAuthStore';
 import api from '../../config/api';
 import RefreshIcon from '../../components/ui/RefreshIcon';
+import { FiLoader } from 'react-icons/fi';
 
 export default function TodoPage() {
   const userData = useAuthStore((state) => state.user);
@@ -104,11 +105,17 @@ export default function TodoPage() {
     <div className="min-h-screen bg-[#F1F3F4] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 flex flex-col gap-6 md:gap-8 w-full overflow-x-hidden">
       <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#014421]">To-Do List</h1>
       
-      <div className="z-20 pointer-events-auto">
+      <div className="z-20 pointer-events-auto mb-2">
         <RefreshIcon fetchDashboardData={fetchTodoData} isRefreshing={isRefreshing} />
       </div>
       
-      <div className="flex flex-col gap-10">
+      <div className="relative flex flex-col gap-10 min-h-[400px]">
+        {isRefreshing && (
+          <div className="absolute inset-0 z-10 bg-[#F1F3F4]/50 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl">
+            <FiLoader className="animate-spin text-5xl text-[#014421] mb-2" />
+            <span className="font-bold text-lg text-[#014421] tracking-wide">Memuat Tugas...</span>
+          </div>
+        )}
         
         <Todo 
           tasks={activeTodos} 

@@ -78,7 +78,7 @@ function Sidebar() {
         {/* Di mobile: tinggi menyesuaikan navbar. Di desktop: tinggi 20 dan ada margin bawah */}
         <div 
           onClick={() => navigate('/')}
-          className="flex justify-center items-center md:group-hover:justify-start md:group-hover:px-5 flex-shrink-0 md:h-20 md:mb-12 transition-all duration-300 cursor-pointer overflow-hidden w-full"
+          className="flex justify-center items-center md:group-hover:justify-start md:group-hover:px-5 flex-shrink-0 md:h-20 md:mb-12 transition-all duration-300 cursor-pointer overflow-hidden w-auto md:w-full"
         >
           <img 
             src={baktiLogo} 
