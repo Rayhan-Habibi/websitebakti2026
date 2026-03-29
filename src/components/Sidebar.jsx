@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, } from 'react-icons/fi'; // Tambahkan FiMenu dan FiX
 import baktiLogo from '../assets/Icons/BaktiLogo.webp';
@@ -15,7 +15,7 @@ function Sidebar() {
   const location = useLocation();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const currentRole = useAuthStore((state) => state.role);
-  
+  const currentDivisi = useAuthStore((state) => state.user?.divisi?.nama_divisi);
   // 1. STATE BARU UNTUK MENU HP
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const currentRoute = location.pathname.split('/').filter(Boolean).pop();
@@ -29,7 +29,7 @@ function Sidebar() {
 
   let navItems = [...baseNavItems]; 
 
-  if (currentRole === "KESTARI") {
+  if (currentRole === "INTI" || currentDivisi === "Kestari" ) {
     navItems.push(
       { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
     );

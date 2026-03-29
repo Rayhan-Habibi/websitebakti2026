@@ -117,7 +117,7 @@ export default function Absensi() {
 
         {/* KARTU 4: Edit Absensi */}
         {
-          role === 'INTI' && (
+          role === 'INTI' || role === 'PRESIDIUM' && (
             <div className='bg-white rounded-md lg:col-span-2 mt-2 shadow-sm border-2 border-gray-200'>
               {/* 🔥 LEMPAR FUNGSI FETCH SEBAGAI onRefresh */}
               <RekapAbsen 
