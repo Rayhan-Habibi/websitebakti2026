@@ -102,7 +102,7 @@ export default function TodoPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F1F3F4] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 flex flex-col gap-6 md:gap-8 w-full overflow-x-hidden">
+    <div className="md:pt-20 min-h-screen bg-[#F1F3F4] p-4 pt-24 md:p-10 lg:pt-10 lg:pl-28 flex flex-col gap-6 md:gap-8 w-full overflow-x-hidden">
       <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#014421]">To-Do List</h1>
       
       <div className="z-20 pointer-events-auto mb-2">

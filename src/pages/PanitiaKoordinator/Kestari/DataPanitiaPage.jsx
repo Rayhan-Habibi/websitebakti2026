@@ -30,7 +30,7 @@ export default function DataPanitiaPage() {
   }, [getDivisi]);
 
   return (
-   <div className="min-h-screen bg-[#F8F9FA] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 w-full overflow-x-hidden">
+   <div className="md:pt-20 min-h-screen bg-[#F8F9FA] p-4 pt-24 md:p-10 lg:pt-10 lg:pl-28 w-full overflow-x-hidden">
       
       <h1 className="text-3xl md:text-4xl font-black text-center text-[#133F25] mb-8 md:mb-12">
         Data Panitia

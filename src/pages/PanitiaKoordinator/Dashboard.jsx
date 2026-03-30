@@ -45,7 +45,7 @@ function Dashboard() {
   }, [fetchDashboardData]); 
 
   return (
-    <div className="min-h-screen pt-20 md:pt-0 bg-[#F1F3F4] lg:pl-24 transition-all duration-300 w-full overflow-x-hidden">
+    <div className="min-h-screen pt-20 md:pt-12 lg:pt-0 bg-[#F1F3F4] lg:pl-24 transition-all duration-300 w-full overflow-x-hidden">
       <main className="p-3 md:p-5 space-y-4 w-full relative"> 
         
         <header className="flex flex-col md:flex-row md:items-center md:justify-center p-2 relative w-full mb-4 md:mb-0 md:h-20 gap-4 md:gap-0">

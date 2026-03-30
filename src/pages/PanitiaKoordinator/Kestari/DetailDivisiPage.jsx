@@ -22,6 +22,7 @@ export default function DetailDivisiPage() {
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [selectedIdDelete, setSelectedIdDelete] = useState(null);
   const user = useAuthStore((state) => state.user);
+  const role = useAuthStore((state) => state.role);
 
   const fetchPanitiaData = useCallback(async () => {
     setIsLoading(true);
@@ -41,7 +42,7 @@ export default function DetailDivisiPage() {
   }, [fetchPanitiaData]);
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] p-4 pt-24 md:p-10 md:pt-10 lg:pl-28 font-sans flex flex-col items-center w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F4F6F8] p-4 pt-24 md:p-10 lg:pt-10 lg:pl-28 font-sans flex flex-col items-center w-full overflow-x-hidden">
       
       <div className="w-full max-w-6xl px-0 md:px-10">
         
@@ -57,7 +58,7 @@ export default function DetailDivisiPage() {
             Data Anggota
           </p>
           
-          {user.divisi.nama_divisi === "Kestari" && (
+          {(user.divisi.nama_divisi === "Kestari" || role === "PRESIDIUM") && (
             <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 md:gap-3 bg-[#388E3C] text-white font-semibold text-base md:text-lg px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm hover:bg-green-700 transition-colors">
             <span className="bg-white text-[#388E3C] rounded-md p-0.5">
               <FiPlus className="text-base md:text-lg font-bold" />
@@ -96,7 +97,7 @@ export default function DetailDivisiPage() {
                     <div className="w-[35%] truncate pr-2" title={item.fakultas}>{item.fakultas}</div>
                     
                     <div className="w-[15%] flex justify-center">
-                      {user.divisi.nama_divisi === "Kestari" && (
+                      {(user.divisi.nama_divisi === "Kestari" || role === "PRESIDIUM") && (
                         <button
                           onClick={() => {
                             setSelectedIdDelete(item.id); 

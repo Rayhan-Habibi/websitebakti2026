@@ -34,10 +34,10 @@ export default function ManagementChart({
         label: 'Volume Absensi',
         data: totalKegiatan === 0 ? [0, 0, 0, 0] : [hadir, tidakHadir, izin, sakit],
         backgroundColor: [
-          '#A7E3B4', // Hadir
-          '#F07E63', // Alpha
-          '#A7EBF4', // Izin
-          '#F3CA6C'  // Sakit
+          '#133F25', // Hadir
+          '#B91C1C', // Alpha
+          '#1D4ED8', // Izin
+          '#B45309'  // Sakit
         ],
         borderRadius: 4,
       },

@@ -8,6 +8,7 @@ import TodoPage from './pages/PanitiaKoordinator/TodoPage'
 import PanitiaLayout from './Layouts/PanitiaLayout'
 import DataPanitiaPage from './pages/PanitiaKoordinator/Kestari/DataPanitiaPage'
 import DetailDivisiPage from './pages/PanitiaKoordinator/Kestari/DetailDivisiPage'
+import Statistik from './pages/PanitiaKoordinator/Statistik'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import ResetPassword from './pages/Auth/ResetPassword'
 import { Navigate } from 'react-router-dom'
@@ -29,6 +30,7 @@ function App() {
           <Route path="/panitia/todo" element={<TodoPage />} />
           <Route path="/panitia/data-panitia" element={<DataPanitiaPage />} />
           <Route path='/panitia/data-panitia/:namaDivisi' element={<DetailDivisiPage />}/>
+          <Route path='/panitia/statistik' element={<Statistik />}/>
         </Route>
       </Route>
 

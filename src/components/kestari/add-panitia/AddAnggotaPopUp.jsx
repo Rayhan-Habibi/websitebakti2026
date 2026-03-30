@@ -42,6 +42,8 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
       const status = error.response?.status;
       if (status === 403){
         alert("Hanya kestari yang dapat mengisi form panitia");
+      } else if (status === 400){
+        alert("Validasi gagal / NIM duplikat / Role tidak valid");
       } else{
         console.error("Error adding panitia:", error);
         alert("Gagal menambahkan data panitia. Cek koneksimu.");

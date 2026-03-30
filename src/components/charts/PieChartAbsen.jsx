@@ -23,7 +23,7 @@ function PieChartAbsen({
         data: totalKegiatan === 0 ? [1] : [hadir, tidakHadir, izin, sakit],
         backgroundColor: totalKegiatan === 0 
           ? ['#E5E7EB'] 
-          : ['#A7E3B4', '#F07E63', '#A7EBF4', '#F3CA6C'],
+          : ['#133F25', '#B91C1C', '#1D4ED8', '#B45309'],
         borderColor: '#ffffff',
         borderWidth: totalKegiatan === 0 ? 0 : 2,
         hoverOffset: 4
@@ -57,7 +57,7 @@ function PieChartAbsen({
   const kehadiranPersen = totalKegiatan > 0 ? Math.round((hadir / totalKegiatan) * 100) : 0;
 
   return (
-    <div className="relative flex flex-col items-center w-full min-h-[300px] h-full justify-between">
+    <div className="relative flex flex-col items-center w-full min-h-[300px] h-full justify-between gap-4">
       {isLoading && (
         <div className="absolute inset-0 z-10 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-md">
           <FiLoader className="animate-spin text-4xl text-[#014421] mb-2" />
@@ -65,13 +65,13 @@ function PieChartAbsen({
         </div>
       )}
       <div className="w-full flex-shrink-0">
-        <h2 className="text-2xl md:text-3xl font-black mb-28 self-start text-[#004D25] whitespace-pre-line">
+        <h2 className="text-2xl md:text-3xl font-black mb-2 self-start text-[#004D25] whitespace-pre-line">
           {title}
         </h2>
       </div>
       
       {/* 3. TERAPKAN STYLE DINAMISNYA KE DALAM DIV */}
-      <div className="w-48 h-48 md:w-56 md:h-56 mb-8 relative flex items-center justify-center flex-shrink-0">
+      <div className="w-48 h-48 md:w-84 md:h-84 mb-4 relative flex items-center justify-center flex-shrink-0">
         <Doughnut data={data} options={options} />
         {/* Teks di tengah Donat */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -79,32 +79,32 @@ function PieChartAbsen({
         </div>
       </div>
 
-      <div className="w-full mt-auto">
-        <p className="font-black text-lg md:text-xl text-black mb-4 uppercase self-start">
+      <div className="w-full mt-2">
+        <p className="font-black text-lg md:text-xl text-black mb-2 uppercase self-start">
           {totalLabel} : {totalKegiatan}
         </p>
         
         <p className="font-black text-sm text-black mb-2 uppercase self-start">Ket :</p>
         
         {/* 4. LEGEND DITAMBAH SAKIT BIAR LENGKAP 4 WARNA */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 w-full justify-start">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full justify-start">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#A7E3B4] rounded-md shadow-sm"></div>
+            <div className="w-5 h-5 bg-[#133F25] rounded-md shadow-sm"></div>
             <span className="font-bold text-sm text-black">Hadir: {hadir}</span>
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#F07E63] rounded-md shadow-sm"></div>
+            <div className="w-5 h-5 bg-[#B91C1C] rounded-md shadow-sm"></div>
             <span className="font-bold text-sm text-black">Alpha: {tidakHadir}</span>
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#A7EBF4] rounded-md shadow-sm"></div>
+            <div className="w-5 h-5 bg-[#1D4ED8] rounded-md shadow-sm"></div>
             <span className="font-bold text-sm text-black">Izin: {izin}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#F3CA6C] rounded-md shadow-sm"></div>
+            <div className="w-5 h-5 bg-[#B45309] rounded-md shadow-sm"></div>
             <span className="font-bold text-sm text-black">Sakit: {sakit}</span>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import useAuthStore from '../../Store/useAuthStore';
 import SuccessPopUp from '../ui/SuccessPopUp';
 import { FiX, FiLoader, FiChevronDown } from 'react-icons/fi';
-import PieChartAbsen from '../dashboard/PieChartAbsen';
+import PieChartAbsen from '../charts/PieChartAbsen';
 
 function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'edit' }) {
   const [displayedData, setDisplayedData] = useState([]);
@@ -95,7 +95,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
             const status = error.response?.status;
             if (status === 400) {
               scannedQrTokens.current.add(decodedText);
-            } else if (status === 403){
+            } else if (status === 403) {
               alert("Bukan berasal dari divisi anda");
             } else {
               console.error("Error scanning QR:", error);
@@ -165,18 +165,18 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
           {/* NEW: PIE CHART RENDER */}
           {statistikData && (
             <div className="w-full flex justify-center mb-8 border-b-2 border-gray-100 pb-8">
-               <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
-                 <PieChartAbsen 
-                   totalKegiatan={statistikData.total_peserta || 0}
-                   hadir={statistikData.hadir || 0}
-                   tidakHadir={statistikData.tidak_hadir || 0}
-                   izin={statistikData.izin || 0}
-                   sakit={statistikData.sakit || 0}
-                   isLoading={isLoading}
-                   title={"Statistik\nAcara"}
-                   totalLabel="Total Absen"
-                 />
-               </div>
+              <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
+                <PieChartAbsen
+                  totalKegiatan={statistikData.total_peserta || 0}
+                  hadir={statistikData.hadir || 0}
+                  tidakHadir={statistikData.tidak_hadir || 0}
+                  izin={statistikData.izin || 0}
+                  sakit={statistikData.sakit || 0}
+                  isLoading={isLoading}
+                  title={"Statistik\nAcara"}
+                  totalLabel="Total Absen"
+                />
+              </div>
             </div>
           )}
 
@@ -242,13 +242,13 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                     const originalStatus = item.status ? item.status.toUpperCase() : 'TIDAK HADIR';
                     const currentStatus = tempStatuses[item.id] !== undefined ? tempStatuses[item.id] : originalStatus;
                     const isChanged = currentStatus !== originalStatus;
-                    
+
                     return (
                       <li key={item.id} className="flex py-3 items-center font-semibold text-black/80 text-xs md:text-sm border-b-2 border-[#014421] last:border-b-2 last:border-b-[#014421] hover:bg-gray-50 transition-colors">
                         <div className="w-[5%] text-center font-black hidden md:block">{index + 1}</div>
                         <div className="w-[30%] md:w-[25%] font-bold pl-2 pr-2 truncate" title={item.nama}>{item.nama}</div>
                         <div className="w-[18%] pr-2 truncate hidden md:block" title={item.fakultas}>{item.fakultas}</div>
-                        
+
                         {/* 1. Status Saat Ini (Badge) */}
                         <div className="w-[20%] flex justify-center px-1">
                           <span className={`px-2 md:px-3 py-1 rounded-md text-[9px] md:text-[11px] font-bold uppercase shadow-sm ${getStatusStyle(item.status)}`}>
@@ -259,10 +259,10 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                         {/* 2. Dropdown Status Baru (Unstyled) */}
                         <div className="w-[20%] flex justify-center px-1">
                           <div className="relative w-full max-w-[120px]">
-                            <select 
+                            <select
                               className="w-full py-1.5 pl-2 pr-5 rounded bg-white border border-gray-300 text-gray-700 font-semibold text-[9px] md:text-[11px] cursor-pointer outline-none appearance-none focus:ring-1 focus:ring-[#133F25]"
                               value={currentStatus}
-                              onChange={(e) => setTempStatuses({...tempStatuses, [item.id]: e.target.value})}
+                              onChange={(e) => setTempStatuses({ ...tempStatuses, [item.id]: e.target.value })}
                             >
                               <option value="HADIR">HADIR</option>
                               <option value="TIDAK HADIR">TIDAK HADIR</option>
@@ -277,7 +277,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
 
                         {/* 3. Tombol Update */}
                         <div className="w-[25%] md:w-[12%] flex justify-center px-1">
-                          <button 
+                          <button
                             onClick={(e) => handleEditAbsen(item.user_id || item.target_user_id || item.userId || item.id, kegiatanId, currentStatus, e)}
                             className={`px-2 py-1.5 rounded text-[9px] md:text-[11px] font-black shadow-sm transition-all uppercase w-full max-w-[80px]
                               ${isChanged ? 'bg-[#133F25] hover:bg-[#0a2314] text-white active:scale-95 cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'}
