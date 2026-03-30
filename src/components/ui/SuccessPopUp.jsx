@@ -22,7 +22,7 @@ export default function SuccessPopUp({ isOpen, onClose, message }) {
       <div className="bg-white rounded-md p-12 shadow-2xl flex flex-col items-center justify-center transform transition-all animate-bounce-short">
         
         {/* KOTAK CEKLIS HIJAU */}
-        <div className="w-28 h-28 bg-[#8CE3A9] rounded-3xl flex items-center justify-center mb-8">
+        <div className="w-28 h-28 bg-green-600 rounded-3xl flex items-center justify-center mb-8">
           <FiCheck className="text-white text-7xl stroke-[4]" />
         </div>
 

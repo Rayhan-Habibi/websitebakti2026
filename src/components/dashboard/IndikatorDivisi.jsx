@@ -8,7 +8,7 @@ function IndikatorDivisi({namaDivisi, warna}) {
           {/* Gunakan style={{ backgroundColor: warna }} agar warnanya dinamis */}
           <div 
             className="w-10 h-10 md:w-12 md:h-12 rounded-xl shadow-sm flex items-center justify-center text-white"
-            
+       
           >
             {getDivisiIcon(namaDivisi, "text-black w-6 h-6 md:w-7 md:h-7")}
           </div>

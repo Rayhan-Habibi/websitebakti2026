@@ -9,6 +9,8 @@ export default function DataPanitiaPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [dataDivisi, setDataDivisi] = useState([]);
   const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const role = useAuthStore((state) => state.role);
 
   const getDivisi = useCallback(async () => {
     setIsLoading(true);
@@ -41,18 +43,20 @@ export default function DataPanitiaPage() {
       )}
       
       <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-6xl mx-auto">
-        {!isLoading && dataDivisi.map((divisi) => (
+        {!isLoading && dataDivisi
+          .filter((divisi) => role === "INTI" || user?.divisi?.nama_divisi === "Kestari" || user?.divisi?.nama_divisi === (divisi.nama_divisi || divisi.nama))
+          .map((divisi) => (
           <Link 
             key={divisi.id}
             to={`/panitia/data-panitia/${divisi.id}`} 
-            state={{namaDivisi: divisi.nama_divisi}}
+            state={{namaDivisi: divisi.nama_divisi || divisi.nama}}
             className="relative w-full sm:w-64 h-28 rounded-2xl overflow-hidden group shadow-md hover:shadow-xl transition-all"
           >
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all z-10"></div>
             
             <img 
               src={bgDivisi} 
-              alt={divisi.nama_divisi} 
+              alt={divisi.nama_divisi || divisi.nama} 
               className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"
             />
             

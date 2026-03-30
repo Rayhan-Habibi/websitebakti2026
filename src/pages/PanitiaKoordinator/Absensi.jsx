@@ -135,7 +135,7 @@ export default function Absensi() {
           <h2 className="text-2xl md:text-3xl font-black mb-8 self-start">
             Qr Absensi Kamu
           </h2>
-          <div className="relative p-2 border-4 border-black rounded-2xl mb-8" id="qr-container">
+          <div className="relative p-2 border-4 border-black rounded-2xl mt-8 mb-8" id="qr-container">
             {user?.qr_token ? (
               <QRCodeSVG 
                 value={user.qr_token.toString()} 
@@ -162,9 +162,8 @@ export default function Absensi() {
           <h3 className="text-xl md:text-2xl font-black text-center">
             {user?.nama}
           </h3>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="w-5 h-5 bg-[#67E8F9] rounded-sm"></div>
-            <span className="font-bold text-sm md:text-base">{user?.divisi?.nama_divisi}</span>
+          <div className="mt-4">
+            <IndikatorDivisi namaDivisi={user?.divisi?.nama_divisi || 'Memuat...'} warna="#67E8F9" />
           </div>
         </div>
 
@@ -202,10 +201,11 @@ export default function Absensi() {
             Tata Cara Absensi
           </h2>
           <ol className="list-decimal list-inside space-y-2 text-sm md:text-base font-semibold text-black/80">
-            <li>Lorem Ipsum is a dummy or placeholder text used in publishing and design to simulate content while focusing on layout and typography.</li>
-            <li>Lorem Ipsum is a dummy or placeholder text used in publishing.</li>
-            <li>publishing and design to simulate content while focusing on layout and typography.</li>
-            <li>balal aoowdm a?n anowdmoamd amowmo dmawm dowa</li>
+            <li>Setiap panitia memiliki <strong>QR Code unik</strong> yang tertera pada halaman ini.</li>
+            <li>Untuk mengisi daftar hadir pada setiap kegiatan/rapat, cukup tunjukkan QR Code ini kepada Pengurus Inti atau Koordinator terkait.</li>
+            <li>Pengurus Inti atau Koordinator akan memindai QR Code Anda menggunakan fitur <strong>Scanner Web</strong> yang terintegrasi di portal ini.</li>
+            <li>Apabila Anda tidak dapat hadir, harap melapor. Status kehadiran seperti <strong>'Sakit'</strong> atau <strong>'Izin'</strong> hanya dapat diperbarui secara manual oleh Koordinator/Pengurus Inti.</li>
+            <li>Statistik kehadiran Anda secara keseluruhan dapat dipantau langsung pada grafik <strong>'Riwayat Personal'</strong>.</li>
           </ol>
         </div>
 

@@ -29,7 +29,7 @@ function Sidebar() {
 
   let navItems = [...baseNavItems]; 
 
-  if (currentRole === "INTI" || currentDivisi === "Kestari" ) {
+  if (currentRole === "INTI" || currentDivisi === "Kestari" || currentRole === "PRESIDIUM") {
     navItems.push(
       { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
     );
@@ -124,7 +124,7 @@ function Sidebar() {
                   `}
                 >
                   <div className="flex justify-center items-center w-5 text-xl flex-shrink-0">
-                    {isPlaceholder ? <div className="w-10 h-10 rounded-full bg-sidebar-placeholder" /> : <Icon />}
+                    {isPlaceholder ? <div className="w-10 h-10 rounded-full bg-sidebar-placeholder" /> : <Icon width={32} height={32} />}
                   </div>
                   {isPlaceholder ? (
                     <div className="h-7 w-full rounded-md bg-sidebar-placeholder opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100 flex-shrink-0" />
@@ -156,7 +156,7 @@ function Sidebar() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
-                <LogoutIcon />
+                <LogoutIcon width={32} height={32} />
               )}
             </div>
             <span className="text-md font-medium whitespace-nowrap opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 delay-100">
@@ -169,7 +169,7 @@ function Sidebar() {
       {/* 4. DROPDOWN MENU MOBILE (MUNCUL KALAU HAMBURGER DIKLIK) */}
       {/* Menggunakan fixed agar melayang menutupi konten di bawahnya */}
       {isMobileMenuOpen && (
-        <div className="fixed top-16 left-0 w-full bg-sidebar-bg/95 backdrop-blur-md shadow-2xl flex flex-col md:hidden z-40 border-t border-white/10 animate-fade-in pb-6 pt-4 px-4 space-y-4">
+        <div className="fixed top-16 left-0 w-full bg-sidebar-bg/95 backdrop-blur-md shadow-2xl flex flex-col md:hidden z-40 border-t border-white/10 animate-fade-in pb-4 pt-3 px-3 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentRoute === item.id;
@@ -178,40 +178,40 @@ function Sidebar() {
               <div 
                 key={`mobile-${item.id}`}
                 onClick={() => handleNavigation(item.path, item.id)}
-                className={`flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer transition-colors
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-colors
                   ${isActive ? 'bg-sidebar-active text-white font-bold' : 'text-white/80 hover:bg-sidebar-active/50'}
                 `}
               >
-                <div className="text-2xl"><Icon /></div>
-                <span className="text-xl">{item.name}</span>
+                <div className="text-base flex-shrink-0"><Icon width={22} height={22} /></div>
+                <span className="text-md truncate">{item.name}</span>
               </div>
             )
           })}
           
           {/* Pembatas untuk Logout di HP */}
-          <div className="w-full h-[1px] bg-white/20 my-2"></div>
+          <div className="w-full h-[1px] bg-white/20 my-4"></div>
           
           {/* Tombol Logout Mobile */}
           <button 
             onClick={handleLogout} 
             disabled={isLoggingOut}
-            className={`flex items-center gap-4 px-6 py-4 rounded-2xl w-full text-left transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl w-full text-left transition-colors ${
               isLoggingOut 
                 ? 'opacity-70 cursor-not-allowed text-red-300' 
                 : 'cursor-pointer text-red-400 hover:bg-red-500/20'
             }`}
           >
-            <div className="text-2xl">
+            <div className="text-base flex-shrink-0">
               {isLoggingOut ? (
-                <svg className="animate-spin h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
-                <LogoutIcon />
+                <LogoutIcon width={22} height={22} />
               )}
             </div>
-            <span className="text-xl font-bold">{isLoggingOut ? 'Keluar...' : 'Logout'}</span>
+            <span className="text-sm font-bold truncate">{isLoggingOut ? 'Keluar...' : 'Logout'}</span>
           </button>
         </div>
       )}

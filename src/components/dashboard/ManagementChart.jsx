@@ -101,7 +101,7 @@ export default function ManagementChart({
         </div>
       )}
       
-      <div className="w-full flex justify-between items-start mb-6 flex-shrink-0">
+      <div className="w-full flex justify-between items-start mb-28 flex-shrink-0">
         <h2 className="text-2xl md:text-3xl font-black text-[#004D25] leading-tight">
           Riwayat<br/>Management
         </h2>

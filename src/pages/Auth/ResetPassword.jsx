@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // Ikon dari react-icons (Heroicons set)
 import { FiBookOpen, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -49,8 +49,8 @@ function ResetPassword() {
         try {
             await axios.post('https://api.baktiunand2026.com/api/auth/ganti-password', 
                 {
-                old_password: oldPassword,
-                new_password: newPassword
+                oldPassword: oldPassword,
+                newPassword: newPassword
                 }, 
                 {
                     headers: {
@@ -63,15 +63,20 @@ function ResetPassword() {
         clearTempToken();
         navigate('/login');
         setShowSuccessPopup(true);
+        
 
         } catch (error) {
         if (error.response) {
             const status = error.response.status;
+            const backendMessage = error.response.data?.message || error.response.data?.error || "Permintaan tidak valid.";
+            console.log("Error dari Backend:", error.response.data);
 
             if (status === 400) {
-            alert("Permintaan tidak valid. Pastikan semua field terisi dengan benar.");
+                alert(`Gagal: ${backendMessage}`);
             } else if (status === 401) {
-            alert("Permintaan tidak valid.")
+                alert(`Gagal: ${backendMessage}`)
+            } else {
+                alert(`Terjadi kesalahan (${status}): ${backendMessage}`);
             }
         } else {
             alert("Terjadi kesalahan pada server. Silahkan coba lagi nanti."); 
@@ -103,7 +108,7 @@ function ResetPassword() {
                   <form className="space-y-6">
                     
                     {/* Input Email */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <label className="text-sm font-semibold text-[#1E4D31]">
                         Old Password
                       </label>
@@ -159,6 +164,15 @@ function ResetPassword() {
                       />
                       {/* Tombol Tampilkan/Sembunyikan */}
                       <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-5 top-[46px] text-2xl text-[#1E4D31]/60 hover:text-[#1E4D31]"
+                      >
+                        {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                      </button>
+                    </div>
+
+                    <button
                         type="submit"
                         disabled={isLoading || newPassword !== confirmPassword || newPassword.length < 6}
                         className={`w-full mt-8 py-4 text-white text-xl font-bold uppercase rounded-xl transition shadow-lg flex justify-center items-center gap-3 ${
@@ -180,11 +194,7 @@ function ResetPassword() {
                             <span>Ubah Password</span>
                         )}
                         </button>
-                    </div>
-                    
-        
-                    
-                  </form>
+                    </form>
                 </div>
               </div>
               {/* POP-UP SUKSES LOGIN */}

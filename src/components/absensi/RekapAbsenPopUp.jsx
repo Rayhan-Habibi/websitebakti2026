@@ -43,6 +43,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
       const status = error.response?.status;
       if (status === 400) {
         alert("Data tidak lengkap");
+        console.log("Errornya :" + error);
       } else if (status === 403) {
         alert("Anda tidak memiliki akses untuk merubah status");
       } else {
@@ -94,6 +95,8 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
             const status = error.response?.status;
             if (status === 400) {
               scannedQrTokens.current.add(decodedText);
+            } else if (status === 403){
+              alert("Bukan berasal dari divisi anda");
             } else {
               console.error("Error scanning QR:", error);
               alert("Gagal memproses scan. Silakan coba lagi.");

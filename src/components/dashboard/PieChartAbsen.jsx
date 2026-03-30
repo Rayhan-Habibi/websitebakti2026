@@ -65,7 +65,7 @@ function PieChartAbsen({
         </div>
       )}
       <div className="w-full flex-shrink-0">
-        <h2 className="text-2xl md:text-3xl font-black mb-6 self-start text-[#004D25] whitespace-pre-line">
+        <h2 className="text-2xl md:text-3xl font-black mb-28 self-start text-[#004D25] whitespace-pre-line">
           {title}
         </h2>
       </div>
