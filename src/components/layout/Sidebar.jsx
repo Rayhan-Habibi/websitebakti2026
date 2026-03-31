@@ -23,29 +23,29 @@ function Sidebar() {
 
   // Konfigurasi Navigasi
   const baseNavItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard'},
+    { id: 'dashboard', name: 'Dashboard', icon: DashboardIcon, path: '/panitia/dashboard' },
     { id: 'absensi', name: 'Absensi', icon: QrIcon, path: '/panitia/absensi' },
     { id: 'todo', name: 'To-Do List', icon: TodoIcon, path: '/panitia/todo' },
   ];
 
-  let navItems = [...baseNavItems]; 
+  let navItems = [...baseNavItems];
 
   if (currentRole === "INTI" || currentDivisi === "Kestari" || currentRole === "PRESIDIUM") {
     navItems.push(
       { id: 'data-panitia', name: 'Data Panitia', icon: DataPanitiaIcon, path: '/panitia/data-panitia' }
     );
-  } 
+  }
 
-  const isMng = currentDivisi?.toLowerCase() === "mng" || 
-                currentDivisi === "Medical and Guard (MNG)" || 
-                currentDivisi?.toLowerCase().includes("medical");
+  const isMng = currentDivisi?.toLowerCase() === "mng" ||
+    currentDivisi === "Medical and Guard (MNG)" ||
+    currentDivisi?.toLowerCase().includes("medical");
 
   if (currentRole === "INTI" || currentRole === "PRESIDIUM" || isMng) {
-    navItems.push({ 
-      id: 'statistik', 
-      name: 'Statistik', 
-      icon: StatistikIcon, 
-      path: '/panitia/statistik' 
+    navItems.push({
+      id: 'statistik',
+      name: 'Statistik',
+      icon: StatistikIcon,
+      path: '/panitia/statistik'
     });
   }
 
@@ -62,17 +62,17 @@ function Sidebar() {
 
   const handleLogout = () => {
     try {
-      setIsLoggingOut(true); 
+      setIsLoggingOut(true);
       setTimeout(() => {
         logout();
         console.log("Logout berhasil!");
         navigate('/login');
         // Nggak perlu setIsLoggingOut(false) karena saat pindah halaman, komponen Sidebar ini akan otomatis mati/hilang.
       }, 800);
-      } catch (error) {
-        console.error("Logout error:", error);
-        alert("Terjadi kesalahan saat logout. Silakan coba lagi.");
-      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Terjadi kesalahan saat logout. Silakan coba lagi.");
+    }
   }
 
 
@@ -84,20 +84,20 @@ function Sidebar() {
         w-full h-16 flex flex-row items-center px-4 justify-between 
         lg:h-screen lg:flex-col lg:py-6 lg:w-15 lg:hover:w-60 lg:justify-start lg:px-0 group"
       >
-        
+
         {/* SPASI KIRI DI MOBILE (Agar Logo bisa persis di tengah) */}
         <div className="w-8 lg:hidden"></div>
 
         {/* 1. LOGO SECTION */}
         {/* Di mobile: tinggi menyesuaikan navbar. Di desktop: tinggi 20 dan ada margin bawah */}
-        <div 
+        <div
           onClick={() => navigate('/')}
           className="flex justify-center items-center lg:group-hover:justify-start lg:group-hover:px-5 flex-shrink-0 lg:h-20 lg:mb-12 transition-all duration-300 cursor-pointer overflow-hidden w-auto lg:w-full"
         >
-          <img 
-            src={baktiLogo} 
-            alt="Logo BAKTI" 
-            className="w-10 h-10 object-contain transition-transform lg:group-hover:scale-110 flex-shrink-0" 
+          <img
+            src={baktiLogo}
+            alt="Logo BAKTI"
+            className="w-10 h-10 object-contain transition-transform lg:group-hover:scale-110 flex-shrink-0"
           />
           <div className="w-0 opacity-0 overflow-hidden transition-all duration-300 lg:group-hover:w-auto lg:group-hover:opacity-100 lg:group-hover:ml-4 hidden lg:flex flex-col">
             <span className="font-black text-[17px] whitespace-nowrap text-white tracking-wider leading-none">
@@ -111,7 +111,7 @@ function Sidebar() {
 
         {/* TOMBOL HAMBURGER DI MOBILE (Berada di ujung kanan) */}
         <div className="w-8 flex justify-end lg:hidden">
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="text-white hover:text-gray-300 transition-colors"
           >
@@ -155,13 +155,12 @@ function Sidebar() {
 
         {/* 3. BOTTOM SECTION / LOGOUT (HANYA MUNCUL DI DESKTOP) */}
         <div className="hidden lg:block px-1 w-full pb-6">
-          <div 
+          <div
             onClick={!isLoggingOut ? handleLogout : undefined}
-            className={`flex items-center gap-6 px-4 py-2 rounded-2xl transition-colors ${
-              isLoggingOut 
-                ? 'opacity-70 cursor-not-allowed text-white' 
+            className={`flex items-center gap-6 px-4 py-2 rounded-2xl transition-colors ${isLoggingOut
+                ? 'opacity-70 cursor-not-allowed text-white'
                 : 'cursor-pointer text-white/70 hover:bg-sidebar-active/50 hover:text-white'
-            }`}
+              }`}
           >
             <div className="flex justify-center items-center w-6 text-3xl flex-shrink-0">
               {isLoggingOut ? (
@@ -187,9 +186,9 @@ function Sidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentRoute === item.id;
-            
+
             return (
-              <div 
+              <div
                 key={`mobile-${item.id}`}
                 onClick={() => handleNavigation(item.path, item.id)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-colors
@@ -201,19 +200,18 @@ function Sidebar() {
               </div>
             )
           })}
-          
+
           {/* Pembatas untuk Logout di HP */}
           <div className="w-full h-[1px] bg-white/20 my-4"></div>
-          
+
           {/* Tombol Logout Mobile */}
-          <button 
-            onClick={handleLogout} 
+          <button
+            onClick={handleLogout}
             disabled={isLoggingOut}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl w-full text-left transition-colors ${
-              isLoggingOut 
-                ? 'opacity-70 cursor-not-allowed text-red-300' 
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl w-full text-left transition-colors ${isLoggingOut
+                ? 'opacity-70 cursor-not-allowed text-red-300'
                 : 'cursor-pointer text-red-400 hover:bg-red-500/20'
-            }`}
+              }`}
           >
             <div className="text-base flex-shrink-0">
               {isLoggingOut ? (

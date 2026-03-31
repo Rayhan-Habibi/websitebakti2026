@@ -171,8 +171,10 @@ export default function Statistik() {
 
       </div>
 
-      {/* REKAPITULASI TABEL SELURUH DIVISI (Khusus INTI/PRESIDIUM/MNG) */}
-      <RekapAbsenSeluruhDivisi />
+      {/* REKAPITULASI TABEL SELURUH DIVISI (Khusus INTI & MNG) */}
+      {(role === "INTI" || isMng) && (
+         <RekapAbsenSeluruhDivisi />
+      )}
 
     </div>
   );

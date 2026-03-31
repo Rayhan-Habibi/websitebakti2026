@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiRefreshCw, FiChevronDown, FiChevronUp, FiFilter, FiX } from 'react-icons/fi';
+import { FiRefreshCw, FiChevronDown, FiChevronUp, FiFilter, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import api from '../../config/api';
 
 export default function RekapAbsenSeluruhDivisi() {
@@ -7,6 +7,9 @@ export default function RekapAbsenSeluruhDivisi() {
   const [divisiOptions, setDivisiOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile toggle filter
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
+  const itemsPerPage = 10;
 
   // Filter States Aktif
   const [filters, setFilters] = useState({
@@ -32,10 +35,14 @@ export default function RekapAbsenSeluruhDivisi() {
     }
   }, []);
 
-  const fetchDataRekap = useCallback(async (activeFilters) => {
+  const fetchDataRekap = useCallback(async (activeFilters, page = 1) => {
     setIsLoading(true);
     try {
-      const params = {};
+      const params = {
+        page: page,
+        limit: itemsPerPage
+      };
+      
       Object.keys(activeFilters).forEach(k => {
           const apiKey = k === 'role_filter' ? 'role' : k;
           if (activeFilters[k] !== '') {
@@ -44,23 +51,43 @@ export default function RekapAbsenSeluruhDivisi() {
       });
       
       const res = await api.get('/api/absensi/rekap-personal', { params });
-      setData(res.data.data || []);
+      
+      // Deteksi struktur response dari backend (paginated by API vs array biasa)
+      const respData = res.data?.data;
+      if (Array.isArray(respData)) {
+          // Backend mengirimkan data dalam bentuk array (belum terpaginasi penuh dari BE)
+          setData(respData);
+          setTotalData(respData.length);
+      } else if (respData && Array.isArray(respData.data)) {
+          // Backend mengirimkan format meta paginasi (misal laravel atau standar { data: [], total: x })
+          setData(respData.data);
+          setTotalData(respData.total || respData.data.length);
+      } else if (res.data && res.data.total !== undefined && Array.isArray(res.data.data)) {
+          setData(res.data.data);
+          setTotalData(res.data.total);
+      } else {
+          setData([]);
+          setTotalData(0);
+      }
     } catch (error) {
       console.error("Gagal menarik rekap personal:", error);
+      setData([]);
+      setTotalData(0);
     }
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     fetchDivisiOptions();
-    fetchDataRekap(filters);
+    fetchDataRekap(filters, 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Hanya run sekali saat mount, subsequent run trigger via apply filter
 
   const handleApplyFilter = (e) => {
     if (e) e.preventDefault();
     setFilters(formValues);
-    fetchDataRekap(formValues);
+    setCurrentPage(1);
+    fetchDataRekap(formValues, 1);
   };
 
   const handleResetFilter = () => {
@@ -70,7 +97,8 @@ export default function RekapAbsenSeluruhDivisi() {
     };
     setFormValues(resetState);
     setFilters(resetState);
-    fetchDataRekap(resetState);
+    setCurrentPage(1);
+    fetchDataRekap(resetState, 1);
   };
 
   const handleSort = (columnKey) => {
@@ -81,12 +109,33 @@ export default function RekapAbsenSeluruhDivisi() {
     // Sinkron state
     setFormValues(updated);
     setFilters(updated);
-    fetchDataRekap(updated);
+    setCurrentPage(1);
+    fetchDataRekap(updated, 1);
   };
 
   const SortIcon = ({ columnKey }) => {
     if (filters.sort_by !== columnKey) return <FiChevronDown className="opacity-30 inline ml-1" />;
     return filters.sort_order === 'asc' ? <FiChevronUp className="inline ml-1 text-green-700" /> : <FiChevronDown className="inline ml-1 text-green-700" />;
+  };
+
+  // Pagination Logic Server+Client Adaptif
+  const totalPages = Math.ceil(totalData / itemsPerPage);
+  
+  // Jika server mereturn seluruh data sekalian (misal API belum full paginated), kita slice param client.
+  // Jika server mengirim array kecil sesuai page (paginated by API), kita pakai data langsung.
+  const isAllDataReturned = data.length > itemsPerPage || data.length === totalData;
+  const currentData = (isAllDataReturned && totalData > itemsPerPage) 
+      ? data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) 
+      : data;
+
+  const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
+  const indexOfLastItem = Math.min(currentPage * itemsPerPage, totalData);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+      fetchDataRekap(filters, pageNumber);
+    }
   };
 
   return (
@@ -105,7 +154,7 @@ export default function RekapAbsenSeluruhDivisi() {
          
          <button 
            onClick={() => setIsFilterOpen(!isFilterOpen)}
-           className="md:hidden mt-4 flex items-center gap-2 bg-[#133F25] text-white px-3 py-2 rounded-lg text-sm font-bold"
+           className="md:hidden mt-4 flex items-center gap-2 bg-[#133F25] text-white px-3 py-2 rounded-lg text-sm font-bold cursor-pointer hover:scale-105 transition-all duration-200"
          >
            <FiFilter /> Filter Pencarian
          </button>
@@ -188,10 +237,10 @@ export default function RekapAbsenSeluruhDivisi() {
 
              {/* Tombol Kontrol */}
              <div className="col-span-1 sm:col-span-2 lg:col-span-2 flex items-end gap-3 mt-2 lg:mt-0">
-                <button type="submit" className="flex-1 bg-[#133F25] hover:bg-green-900 transition-colors text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2">
+                <button type="submit" className="flex-1 bg-[#133F25] hover:bg-green-900 transition-all duration-200 cursor-pointer hover:scale-105 text-white font-bold py-2 px-4 rounded-md flex justify-center items-center gap-2">
                    <FiFilter /> Terapkan Pencarian
                 </button>
-                <button type="button" onClick={handleResetFilter} className="bg-gray-200 hover:bg-gray-300 transition-colors text-gray-700 font-bold py-2 px-4 rounded-md flex items-center justify-center gap-2" title="Reset Aturan">
+                <button type="button" onClick={handleResetFilter} className="bg-gray-200 hover:bg-gray-300 transition-all duration-200 cursor-pointer hover:scale-105 text-gray-700 font-bold py-2 px-4 rounded-md flex items-center justify-center gap-2" title="Reset Aturan">
                    <FiX /> Bersihkan
                 </button>
              </div>
@@ -240,7 +289,7 @@ export default function RekapAbsenSeluruhDivisi() {
                    </td>
                 </tr>
               ) : (
-                data.map((item, idx) => {
+                currentData.map((item, idx) => {
                   // Warna baris merah terang jika alpha >= 25% *WARNING CONDITION HIGHLIGHT*
                   const isCritical = parseFloat(item.persen_alpha) >= 25;
                   
@@ -287,8 +336,51 @@ export default function RekapAbsenSeluruhDivisi() {
       </div>
       
       {!isLoading && data.length > 0 && (
-        <div className="mt-4 text-xs font-bold text-gray-400 text-right">
-           Menampilkan {data.length} data personil.
+        <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-sm font-medium text-gray-500">
+             Menampilkan {indexOfFirstItem + 1} - {indexOfLastItem} dari {totalData} personil
+          </div>
+          
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-md transition-all duration-200 flex items-center justify-center ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-[#133F25] hover:bg-white hover:shadow-sm cursor-pointer'}`}
+              >
+                <FiChevronLeft className="w-4 h-4" />
+              </button>
+              
+              <div className="flex items-center gap-1 px-1">
+                {[...Array(totalPages)].map((_, i) => {
+                  const page = i + 1;
+                  // Tampilkan 1 halaman di sekitar halaman saat ini, serta halaman pertama dan terakhir
+                  if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`min-w-[32px] h-8 px-2 flex items-center justify-center rounded-md text-sm font-bold transition-all duration-200 ${currentPage === page ? 'bg-[#133F25] text-white shadow-sm' : 'text-gray-600 hover:bg-white hover:text-[#133F25] hover:shadow-sm'}`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  } else if (page === currentPage - 2 || page === currentPage + 2) {
+                    return <span key={`ellipsis-${page}`} className="text-gray-400 px-1">...</span>;
+                  }
+                  return null;
+                })}
+              </div>
+
+              <button 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-md transition-all duration-200 flex items-center justify-center ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-[#133F25] hover:bg-white hover:shadow-sm cursor-pointer'}`}
+              >
+                <FiChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
 

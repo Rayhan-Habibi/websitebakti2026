@@ -3,7 +3,7 @@ import api from '../../config/api';
 import { Html5Qrcode } from 'html5-qrcode';
 import useAuthStore from '../../Store/useAuthStore';
 import SuccessPopUp from '../ui/SuccessPopUp';
-import { FiX, FiLoader, FiChevronDown } from 'react-icons/fi';
+import { FiX, FiLoader, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import PieChartAbsen from '../charts/PieChartAbsen';
 
 function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'edit' }) {
@@ -11,6 +11,9 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
   const [statistikData, setStatistikData] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const token = useAuthStore((state) => state.token);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
+  const itemsPerPage = 20;
   const [isLoading, setIsLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const scannerRef = useRef(null);
@@ -18,17 +21,33 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
   const scannerContainerId = `qr-reader-${kegiatanId || 'default'}`;
   const [tempStatuses, setTempStatuses] = useState({});
 
-  const fetchAbsensi = useCallback(async () => {
+  const fetchAbsensi = useCallback(async (page = 1) => {
     if (!kegiatanId) return;
     setIsLoading(true);
     try {
-      const response = await api.get(`/api/absensi/kegiatan/${kegiatanId}`);
-      setDisplayedData(response.data.data || []);
-      setStatistikData(response.data.statistik || null);
-      console.log(response.data)
+      const response = await api.get(`/api/absensi/kegiatan/${kegiatanId}`, {
+         params: { page, limit: itemsPerPage }
+      });
+      
+      const respData = response.data?.data;
+      if (Array.isArray(respData)) {
+          setDisplayedData(respData);
+          setTotalData(respData.length);
+      } else if (respData && Array.isArray(respData.data)) {
+          setDisplayedData(respData.data);
+          setTotalData(respData.total || respData.data.length);
+      } else if (response.data && response.data.total !== undefined && Array.isArray(response.data.data)) {
+          setDisplayedData(response.data.data);
+          setTotalData(response.data.total);
+      } else {
+          setDisplayedData([]);
+          setTotalData(0);
+      }
+      setStatistikData(response.data?.statistik || null);
     } catch (error) {
       console.error("Gagal mengambil data absensi:", error);
       setDisplayedData([]);
+      setTotalData(0);
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +57,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
     e.preventDefault();
     try {
       await api.post(`/api/absensi/manual`, { target_user_id: userId, kegiatan_id: kegiatanId, status: statusToUpdate });
-      fetchAbsensi();
+      fetchAbsensi(currentPage);
     } catch (error) {
       const status = error.response?.status;
       if (status === 400) {
@@ -54,12 +73,14 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
 
   useEffect(() => {
     if (isOpen) {
-      fetchAbsensi();
+      setCurrentPage(1);
+      fetchAbsensi(1);
     } else {
       setDisplayedData([]);
       scannedQrTokens.current.clear();
     }
-  }, [isOpen, fetchAbsensi]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Inisialisasi & Cleanup Scanner
   useEffect(() => {
@@ -90,7 +111,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
 
             scannedQrTokens.current.add(decodedText);
             setShowSuccess(true);
-            fetchAbsensi();
+            fetchAbsensi(currentPage);
           } catch (error) {
             const status = error.response?.status;
             if (status === 400) {
@@ -142,6 +163,21 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
     }
   };
 
+  const totalPages = Math.ceil(totalData / itemsPerPage);
+  const isAllDataReturned = displayedData.length > itemsPerPage || displayedData.length === totalData;
+  const currentData = (isAllDataReturned && totalData > itemsPerPage) 
+      ? displayedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) 
+      : displayedData;
+  const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
+  const indexOfLastItem = Math.min(currentPage * itemsPerPage, totalData);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+      fetchAbsensi(pageNumber);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -154,7 +190,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
           <h2 className="text-xl lg:text-2xl font-black text-[#004D25] tracking-wide m-0">
             Absensi Anggota
           </h2>
-          <button onClick={onClose} className="text-[#133F25] hover:text-red-500 transition-colors">
+          <button onClick={onClose} className="text-[#133F25] hover:text-red-500 transition-all duration-200 cursor-pointer hover:scale-110">
             <FiX className="text-4xl" />
           </button>
         </div>
@@ -162,23 +198,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
         {/* --- KONTEN --- */}
         <div className="p-4 md:p-8 overflow-y-auto flex-grow relative">
 
-          {/* NEW: PIE CHART RENDER */}
-          {statistikData && (
-            <div className="w-full flex justify-center mb-8 border-b-2 border-gray-100 pb-8">
-              <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
-                <PieChartAbsen
-                  totalKegiatan={statistikData.total_peserta || 0}
-                  hadir={statistikData.hadir || 0}
-                  tidakHadir={statistikData.tidak_hadir || 0}
-                  izin={statistikData.izin || 0}
-                  sakit={statistikData.sakit || 0}
-                  isLoading={isLoading}
-                  title={"Statistik\nAcara"}
-                  totalLabel="Total Absen"
-                />
-              </div>
-            </div>
-          )}
+          
 
           {mode !== 'chart' && (
             <div className="flex justify-center mb-4">
@@ -238,14 +258,14 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                 </div>
               ) : (
                 <ul className="flex flex-col">
-                  {displayedData.map((item, index) => {
+                  {currentData.map((item, index) => {
                     const originalStatus = item.status ? item.status.toUpperCase() : 'TIDAK HADIR';
                     const currentStatus = tempStatuses[item.id] !== undefined ? tempStatuses[item.id] : originalStatus;
                     const isChanged = currentStatus !== originalStatus;
 
                     return (
                       <li key={item.id} className="flex py-3 items-center font-semibold text-black/80 text-xs md:text-sm border-b-2 border-[#014421] last:border-b-2 last:border-b-[#014421] hover:bg-gray-50 transition-colors">
-                        <div className="w-[5%] text-center font-black hidden md:block">{index + 1}</div>
+                        <div className="w-[5%] text-center font-black hidden md:block">{indexOfFirstItem + index + 1}</div>
                         <div className="w-[30%] md:w-[25%] font-bold pl-2 pr-2 truncate" title={item.nama}>{item.nama}</div>
                         <div className="w-[18%] pr-2 truncate hidden md:block" title={item.fakultas}>{item.fakultas}</div>
 
@@ -279,8 +299,8 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                         <div className="w-[25%] md:w-[12%] flex justify-center px-1">
                           <button
                             onClick={(e) => handleEditAbsen(item.user_id || item.target_user_id || item.userId || item.id, kegiatanId, currentStatus, e)}
-                            className={`px-2 py-1.5 rounded text-[9px] md:text-[11px] font-black shadow-sm transition-all uppercase w-full max-w-[80px]
-                              ${isChanged ? 'bg-[#133F25] hover:bg-[#0a2314] text-white active:scale-95 cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'}
+                            className={`px-2 py-1.5 rounded text-[9px] md:text-[11px] font-black shadow-sm transition-all duration-200 uppercase w-full max-w-[80px]
+                              ${isChanged ? 'bg-[#133F25] hover:bg-[#0a2314] text-white active:scale-95 cursor-pointer hover:scale-105' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'}
                             `}
                             disabled={!isChanged}
                           >
@@ -293,13 +313,80 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                 </ul>
               )}
             </div>
+            
+            {!isLoading && totalData > 0 && (
+              <div className="mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="text-xs font-medium text-gray-500">
+                   Menampilkan {indexOfFirstItem + 1} - {indexOfLastItem} dari {totalData} personil
+                </div>
+                
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+                    <button 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`p-1 md:p-2 rounded-md transition-all duration-200 flex items-center justify-center ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-[#133F25] hover:bg-white hover:shadow-sm cursor-pointer'}`}
+                    >
+                      <FiChevronLeft className="w-4 h-4" />
+                    </button>
+                    
+                    <div className="flex items-center gap-1 px-1">
+                      {[...Array(totalPages)].map((_, i) => {
+                        const page = i + 1;
+                        if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => handlePageChange(page)}
+                              className={`min-w-[28px] h-7 md:min-w-[32px] md:h-8 px-1 md:px-2 flex items-center justify-center rounded-md text-xs md:text-sm font-bold transition-all duration-200 ${currentPage === page ? 'bg-[#133F25] text-white shadow-sm' : 'text-gray-600 hover:bg-white hover:text-[#133F25] hover:shadow-sm'}`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (page === currentPage - 2 || page === currentPage + 2) {
+                          return <span key={`ellipsis-${page}`} className="text-gray-400 px-1 text-xs">...</span>;
+                        }
+                        return null;
+                      })}
+                    </div>
+
+                    <button 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`p-1 md:p-2 rounded-md transition-all duration-200 flex items-center justify-center ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-[#133F25] hover:bg-white hover:shadow-sm cursor-pointer'}`}
+                    >
+                      <FiChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
+
+          {/* NEW: PIE CHART RENDER */}
+          {statistikData && (
+            <div className="w-full flex justify-center my-8 border-b-2 border-gray-100 pb-8">
+              <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
+                <PieChartAbsen
+                  totalKegiatan={statistikData.total_peserta || 0}
+                  hadir={statistikData.hadir || 0}
+                  tidakHadir={statistikData.tidak_hadir || 0}
+                  izin={statistikData.izin || 0}
+                  sakit={statistikData.sakit || 0}
+                  isLoading={isLoading}
+                  title={"Statistik\nAcara"}
+                  totalLabel="Total Absen"
+                />
+              </div>
+            </div>
+          )}
 
         </div>
 
         {/* --- FOOTER --- */}
         <div className="px-4 md:px-8 py-5 border-t border-gray-200 bg-white flex justify-end flex-shrink-0">
-          <button onClick={onClose} className="flex items-center gap-2.5 bg-[#014421] text-white font-black text-xl uppercase px-12 py-3 rounded-xl shadow-md hover:bg-green-900 transition-colors active:scale-95">
+          <button onClick={onClose} className="flex items-center gap-2.5 bg-[#014421] text-white font-black text-xl uppercase px-12 py-3 rounded-xl shadow-md hover:bg-green-900 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95">
             DONE
           </button>
         </div>

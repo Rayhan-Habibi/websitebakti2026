@@ -87,7 +87,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
           <button 
             onClick={onClose}
             disabled={isLoading}
-            className="flex items-center gap-2.5 bg-[#133F25] text-white font-extrabold text-sm uppercase px-6 py-3 rounded-xl shadow-md hover:bg-green-900 transition-colors"
+            className="flex items-center gap-2.5 bg-[#133F25] text-white font-extrabold text-sm uppercase px-6 py-3 rounded-xl shadow-md hover:bg-green-900 transition-all duration-200 cursor-pointer hover:scale-105"
           >
             <FiArrowLeft className="text-sm flex-shrink-0" />
             <span className='m-0'>Back</span>
@@ -106,7 +106,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               <button 
                 type="button"
                 onClick={() => setType('Rapat')}
-                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all border-2 ${
+                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all duration-200 cursor-pointer hover:scale-105 border-2 ${
                   type === 'Rapat' 
                     ? 'border-[#133F25] text-[#133F25] bg-white' 
                     : 'border-gray-200 text-gray-400 bg-gray-50 hover:bg-white hover:text-[#133F25]'
@@ -117,7 +117,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               <button 
                 type="button"
                 onClick={() => setType('Tugas')}
-                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all border-2 ${
+                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all duration-200 cursor-pointer hover:scale-105 border-2 ${
                   type === 'Tugas' 
                     ? 'border-[#133F25] text-[#133F25] bg-white' 
                     : 'border-gray-200 text-gray-400 bg-gray-50 hover:bg-white hover:text-[#133F25]'
@@ -263,7 +263,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               !endDate || 
               (type === 'Rapat' && (!time || !place))
             } 
-            className="flex items-center gap-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-extrabold text-2xl uppercase px-16 py-4 rounded-xl shadow-md hover:from-green-600 hover:to-green-800 transition-all cursor-pointer transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-extrabold text-2xl uppercase px-16 py-4 rounded-xl shadow-md hover:from-green-600 hover:to-green-800 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isLoading ? (
               <>

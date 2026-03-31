@@ -5,6 +5,7 @@ import FinishedTodo from '../../components/todo/FinishedTodo';
 import useAuthStore from '../../Store/useAuthStore';
 import api from '../../config/api';
 import RefreshIcon from '../../components/ui/RefreshIcon';
+import CancelModal from '../../components/ui/CancelModal';
 import { FiLoader } from 'react-icons/fi';
 
 export default function TodoPage() {
@@ -14,6 +15,8 @@ export default function TodoPage() {
   
   const [todos, setTodos] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   // FIX: Renamed from fetchDashboardData → fetchTodoData
   const fetchTodoData = useCallback(async () => {
@@ -38,6 +41,12 @@ export default function TodoPage() {
   }, [fetchTodoData]); 
 
   const handleToggleTask = async (id, currentStatus) => {
+    if (currentStatus === 'delete') {
+      setItemToDelete(id);
+      setDeleteModalOpen(true);
+      return;
+    }
+
     const newStatus = !currentStatus;
     const backupTodos = [...todos];
 
@@ -135,6 +144,15 @@ export default function TodoPage() {
         )} 
 
       </div>
+
+      <CancelModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        id={itemToDelete}
+        message="Hapus Tugas Ini?"
+        onRefresh={fetchTodoData}
+        endpoint="todos"
+      />
     </div>
   );
 }

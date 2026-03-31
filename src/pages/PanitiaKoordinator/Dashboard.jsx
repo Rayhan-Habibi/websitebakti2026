@@ -68,13 +68,13 @@ function Dashboard() {
                   <div className="flex border-2 border-[#133F25] font-extrabold text-sm rounded-sm overflow-hidden shadow-sm">
                     <button 
                       onClick={() => setViewMode('global')}
-                      className={`px-6 py-1.5 transition-colors ${ viewMode === 'global' ? 'bg-[#133F25] text-white' : 'bg-white text-[#133F25] hover:bg-gray-100' }`}
+                      className={`px-6 py-1.5 cursor-pointer hover:scale-105 transition-all duration-200 ${ viewMode === 'global' ? 'bg-[#133F25] text-white' : 'bg-white text-[#133F25] hover:bg-gray-100' }`}
                     >
                       Global
                     </button>
                     <button 
                       onClick={() => setViewMode('divisi')}
-                      className={`px-6 py-1.5 transition-colors ${ viewMode === 'divisi' ? 'bg-[#133F25] text-white' : 'bg-white text-[#133F25] hover:bg-gray-100' }`}
+                      className={`px-6 py-1.5 cursor-pointer hover:scale-105 transition-all duration-200 ${ viewMode === 'divisi' ? 'bg-[#133F25] text-white' : 'bg-white text-[#133F25] hover:bg-gray-100' }`}
                     >
                       Divisi
                     </button>

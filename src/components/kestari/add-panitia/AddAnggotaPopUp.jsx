@@ -63,7 +63,7 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
         <div className="px-10 pt-10 pb-4 flex justify-start items-center flex-shrink-0">
           <button 
             onClick={onClose}
-            className="flex items-center gap-2.5 bg-[#388E3C] text-white font-extrabold text-lg px-6 py-2.5 rounded-xl shadow-md hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2.5 bg-[#388E3C] text-white font-extrabold text-lg px-6 py-2.5 rounded-xl shadow-md hover:bg-green-700 transition-all duration-200 cursor-pointer hover:scale-105"
           >
             <FiArrowLeft className="text-2xl flex-shrink-0" />
             <span className='m-0'>Back</span>
@@ -82,7 +82,7 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
               <button 
                 type="button"
                 onClick={() => setRole('PANITIA')}
-                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all border-2 ${
+                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all duration-200 cursor-pointer hover:scale-105 border-2 ${
                   role === 'PANITIA' 
                     ? 'border-[#133F25] text-[#133F25] bg-white' 
                     : 'border-gray-200 text-gray-400 bg-gray-50 hover:bg-white hover:text-[#133F25]'
@@ -93,7 +93,7 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
               <button 
                 type="button"
                 onClick={() => setRole('PRESIDIUM')}
-                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all border-2 ${
+                className={`px-8 py-2.5 rounded-xl font-extrabold text-sm shadow-md transition-all duration-200 cursor-pointer hover:scale-105 border-2 ${
                   role === 'PRESIDIUM' 
                     ? 'border-[#133F25] text-[#133F25] bg-white' 
                     : 'border-gray-200 text-gray-400 bg-gray-50 hover:bg-white hover:text-[#133F25]'
@@ -180,7 +180,7 @@ export default function AddAnggotaPopUp({ isOpen, onClose, onSuccess, divisiId, 
           <label 
             htmlFor="submitAnggota"
             // Kalau lagi loading, bikin tombolnya agak transparan & cursor not-allowed biar gak diklik dobel
-            className={`flex items-center gap-2.5 bg-gradient-to-r from-[#8CE3A9] to-[#388E3C] text-white font-extrabold text-2xl px-12 py-3.5 rounded-xl shadow-md transition-all ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer transform active:scale-95'}`}
+            className={`flex items-center gap-2.5 bg-gradient-to-r from-[#8CE3A9] to-[#388E3C] text-white font-extrabold text-2xl px-12 py-3.5 rounded-xl shadow-md transition-all duration-200 cursor-pointer hover:scale-105 ${isLoading ? 'opacity-70 cursor-not-allowed hover:scale-100' : 'hover:shadow-lg transform active:scale-95'}`}
           >
             {isLoading ? <FiLoader className="animate-spin text-2xl" /> : <span>Tambah</span>}
           </label>

@@ -59,7 +59,7 @@ export default function DetailDivisiPage() {
           </p>
           
           {(user.divisi.nama_divisi === "Kestari" || role === "PRESIDIUM") && (
-            <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 md:gap-3 bg-[#388E3C] text-white font-semibold text-base md:text-lg px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm hover:bg-green-700 transition-colors">
+            <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 md:gap-3 bg-[#388E3C] text-white font-semibold text-base md:text-lg px-3 py-2 md:px-4 md:py-2 rounded-xl shadow-sm hover:bg-green-700 transition-all duration-200 cursor-pointer hover:scale-105">
             <span className="bg-white text-[#388E3C] rounded-md p-0.5">
               <FiPlus className="text-base md:text-lg font-bold" />
             </span>
@@ -103,7 +103,7 @@ export default function DetailDivisiPage() {
                             setSelectedIdDelete(item.id); 
                             setCancelModal(true);
                           }}
-                          className="flex items-center gap-1.5 bg-[#D32F2F] text-white font-medium text-xs md:text-sm px-3 md:px-5 py-2 rounded-lg shadow-sm hover:bg-red-800 transition-colors active:scale-95">
+                          className="flex items-center gap-1.5 bg-[#D32F2F] text-white font-medium text-xs md:text-sm px-3 md:px-5 py-2 rounded-lg shadow-sm hover:bg-red-800 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95">
                           <FiTrash2 className="text-base md:text-lg flex-shrink-0" />
                         <span className="hidden md:inline">Hapus</span>
                        </button>

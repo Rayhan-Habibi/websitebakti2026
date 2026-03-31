@@ -7,6 +7,7 @@ import { FiDownload } from 'react-icons/fi';
 import api from '../../config/api';
 import PieChartAbsen from '../../components/charts/PieChartAbsen';
 import ManagementChart from '../../components/charts/ManagementChart';
+import baktiLogo from '../../assets/Icons/BaktiLogo.webp';
 
 export default function Absensi() {
 
@@ -16,7 +17,6 @@ export default function Absensi() {
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
 
   const [chartData, setChartData] = React.useState({ personal: null, management: null });
-  const [absenKegiatan, setAbsenKegiatan] = React.useState([]);
   const [isFetchingAbsen, setIsFetchingAbsen] = React.useState(true);
 
   // Pastikan user data sudah di-fetch
@@ -28,35 +28,17 @@ export default function Absensi() {
 
   const fetchAbsensiData = useCallback(async () => {
     setIsFetchingAbsen(true);
-    // Menggunakan Promise.allSettled agar jika satu gagal, yang lain tetap jalan
-    const [resultStatistik, resultAbsen] = await Promise.allSettled([
-      api.get('/api/absensi/statistik'),
-      api.get('/api/absensi/rekap-kegiatan'),
-    ]);
-
-    // Handle Endpoint 1: Statistik
-    if (resultStatistik.status === 'fulfilled') {
-      const response = resultStatistik.value;
-      const respData = response.data.data || response.data;
-      setChartData({
-        personal: respData.personal || respData, // Fallback jika format json masih versi lama
-        management: respData.management || null
-      });
-      console.log("Chart Data Murni dari API: ", respData);
-    } else {
-      console.error("❌ Gagal menarik API Statistik Absensi:", resultStatistik.reason);
+    try {
+        const response = await api.get('/api/absensi/statistik');
+        const respData = response.data.data || response.data;
+        setChartData({
+          personal: respData.personal || respData,
+          management: respData.management || null
+        });
+    } catch (error) {
+        console.error("❌ Gagal menarik API Statistik Absensi:", error);
     }
-
-    // Handle Endpoint 2: Rekap Kegiatan
-    if (resultAbsen.status === 'fulfilled') {
-      const response = resultAbsen.value;
-      setAbsenKegiatan(response.data.data || []);
-    } else {
-      console.error("❌ Gagal menarik API Rekap Kegiatan Absensi:", resultAbsen.reason);
-    }
-
     setIsFetchingAbsen(false);
-
   }, [token]);
 
   useEffect(() => {
@@ -137,11 +119,27 @@ export default function Absensi() {
           </h2>
           <div className="relative p-2 border-4 border-black rounded-2xl mt-8 mb-8" id="qr-container">
             {user?.qr_token ? (
-              <QRCodeSVG
-                value={user.qr_token.toString()}
-                size={256}
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              />
+              <div className="relative w-full h-full flex justify-center items-center">
+                <QRCodeSVG
+                  value={user.qr_token.toString()}
+                  size={256}
+                  level="H"
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  imageSettings={{
+                    src: baktiLogo,
+                    height: 64,
+                    width: 64,
+                    excavate: true,
+                  }}
+                />
+                {/* Overlay DOM Element Tepat Di Atas Excavate Hole untuk Style Border */}
+                <div 
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-[3px] border-[#133F25] rounded-xl flex items-center justify-center p-1.5 shadow-md"
+                  style={{ width: "26%", height: "26%" }}
+                >
+                  <img src={baktiLogo} alt="Logo" className="w-full h-full object-contain drop-shadow-sm" />
+                </div>
+              </div>
             ) : (
               <div className="w-64 h-64 flex items-center justify-center bg-gray-100 rounded-xl">
                 <span className="animate-pulse font-bold text-gray-400">Memuat QR...</span>
@@ -152,7 +150,7 @@ export default function Absensi() {
           <button
             onClick={handleDownloadQR}
             disabled={!user?.qr_token}
-            className="flex items-center gap-2 bg-[#133F25] text-white font-extrabold uppercase px-6 py-3 rounded-lg shadow-md hover:bg-green-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-6 active:scale-95"
+            className="flex items-center gap-2 bg-[#133F25] text-white font-extrabold uppercase px-6 py-3 rounded-lg shadow-md hover:bg-green-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-6 active:scale-95 cursor-pointer hover:scale-105 disabled:hover:scale-100"
           >
             <FiDownload className="text-xl" />
             <span>Download QR</span>
@@ -197,11 +195,7 @@ export default function Absensi() {
         {
           (role === 'INTI' || role === 'PRESIDIUM') && (
             <div className='bg-white rounded-md md:col-span-2 lg:col-span-full mt-2 shadow-sm border-2 border-gray-200'>
-              <RekapAbsen
-                data={absenKegiatan}
-                onRefresh={fetchAbsensiData}
-                isLoading={isFetchingAbsen}
-              />
+              <RekapAbsen />
             </div>
           )
         }

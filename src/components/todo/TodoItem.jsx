@@ -1,5 +1,7 @@
 import React from 'react';
-import { FiClock, FiMapPin, FiAlertCircle, FiCheck } from 'react-icons/fi';
+import { FiClock, FiMapPin, FiAlertCircle, FiCheck, FiTrash2 } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
+import useAuthStore from '../../Store/useAuthStore';
 
 /**
  * Komponen reusable untuk menampilkan satu item tugas.
@@ -13,6 +15,11 @@ import { FiClock, FiMapPin, FiAlertCircle, FiCheck } from 'react-icons/fi';
 function TodoItem({ todo, onToggle, variant = 'active', hideCheckbox = false }) {
   const isFinished = variant === 'finished';
   const isMissed = variant === 'missed';
+  const location = useLocation();
+  const isTodoPage = location.pathname.includes('/todo');
+  const role = useAuthStore((state) => state.role);
+
+  const canDelete = (role === 'INTI' || role === 'PRESIDIUM') && isTodoPage;
 
   const borderClass = isMissed
     ? 'border-b-2 border-[#133F25]'
@@ -49,20 +56,33 @@ function TodoItem({ todo, onToggle, variant = 'active', hideCheckbox = false }) 
         <div className={`flex flex-col w-full ${isFinished ? 'opacity-60' : ''}`}>
           
           {/* Judul */}
-          <div className="flex justify-between w-full">
-            <span className={`text-xl font-bold transition-all ${
+          <div className="flex justify-between w-full items-start">
+            <span className={`text-xl font-bold transition-all pr-4 ${
               todo.is_done && !isFinished ? 'text-gray-400 line-through' : 'text-[#133F25]'
             }`}>
               {todo.judul_tugas || todo.tugas}
             </span>
 
-            {/* Alert (untuk missed/active with deadline dekat) */}
-            {isMissed && todo.alert && (
-              <div className="flex items-start gap-2 text-red-600 font-bold text-sm lg:text-base whitespace-nowrap ml-4">
-                <FiAlertCircle className="text-xl lg:text-2xl stroke-[2.5]" />
-                <span className="hidden md:inline">{todo.alert}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Alert (untuk missed/active with deadline dekat) */}
+              {isMissed && todo.alert && (
+                <div className="flex items-start gap-2 text-red-600 font-bold text-sm lg:text-base whitespace-nowrap">
+                  <FiAlertCircle className="text-xl lg:text-2xl stroke-[2.5]" />
+                  <span className="hidden md:inline">{todo.alert}</span>
+                </div>
+              )}
+              
+              {/* TOMBOL HAPUS */}
+              {canDelete && (
+                <button 
+                  onClick={() => onToggle && onToggle(todo.id, 'delete')}
+                  className="p-1.5 md:p-2 text-red-500 hover:text-white hover:bg-[#D32F2F] bg-red-50 rounded-lg transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95 border border-red-200 shadow-sm"
+                  title="Hapus Todo"
+                >
+                  <FiTrash2 className="text-lg md:text-xl" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Deskripsi */}
