@@ -1,4 +1,5 @@
 import axios from 'axios';
+import useAuthStore from '../Store/useAuthStore';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -12,44 +13,39 @@ const api = axios.create({
 
 // Interceptor: Otomatis tambahkan header Authorization ke setiap request
 api.interceptors.request.use((config) => {
-  // Ambil token langsung dari LocalStorage Zustand (tanpa import hook)
-  const stored = localStorage.getItem('bakti-auth-storage');
-  if (stored) {
-    try {
-      const { state } = JSON.parse(stored);
-      if (state?.token) {
-        config.headers.Authorization = `Bearer ${state.token}`;
-      }
-    } catch (e) {
-      // Jika parsing gagal, abaikan
-    }
+  // Ambil token dari Zustand store langsung (tanpa hook, pakai getState)
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// Flag untuk mencegah multiple redirect bersamaan (race condition)
+let isRedirectingToLogin = false;
 
 // Interceptor: Otomatis logout jika token sudah expire (response 401)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Hapus auth state dari Zustand store
-      const stored = localStorage.getItem('bakti-auth-storage');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          // Cek apakah memang ada token yang tersimpan (berarti ini bukan halaman login)
-          if (parsed?.state?.token) {
-            // Reset state di localStorage
-            parsed.state = { token: null, tempToken: null, user: {}, role: null };
-            localStorage.setItem('bakti-auth-storage', JSON.stringify(parsed));
+      const currentToken = useAuthStore.getState().token;
 
-            // Redirect ke halaman login
-            window.location.href = '/login';
-          }
-        } catch (e) {
-          // Jika parsing gagal, abaikan
-        }
+      // Cek apakah memang ada token yang tersimpan (berarti ini bukan halaman login)
+      if (currentToken && !isRedirectingToLogin) {
+        isRedirectingToLogin = true;
+
+        // Gunakan logout() dari Zustand agar state di memori DAN localStorage konsisten
+        useAuthStore.getState().logout();
+
+        // Redirect ke halaman login
+        window.location.href = '/login';
       }
+
+      // Kembalikan promise yang tidak pernah resolve/reject
+      // Ini mencegah catch block di komponen menampilkan alert error yang membingungkan
+      // karena halaman akan segera redirect ke login
+      return new Promise(() => {});
     }
     return Promise.reject(error);
   }

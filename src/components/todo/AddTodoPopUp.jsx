@@ -7,6 +7,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
   const [type, setType] = useState('Rapat'); 
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
+  const [deadline, setDeadline] = useState('');
   const [time, setTime] = useState('');
 
   const [place, setPlace] = useState('');
@@ -30,10 +31,10 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
   const resetForm = () => {
     setName('');
     setDate('');
+    setDeadline('');
     setTime('');
     setPlace('');
     setDescription('');
-
   };
 
   const handleSubmit = async (e) => {
@@ -59,7 +60,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
       tugas: name,
       deskripsi: description,
       start_date: date,
-
+      deadline: deadline,
       divisi_id: divisiId,
     };
 
@@ -188,6 +189,22 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
 
             </div>
 
+            {type === 'Tugas' && (
+              <div>
+                <label htmlFor="deadline" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
+                  Deadline
+                </label>
+                <input 
+                  id="deadline"
+                  type="date" 
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="w-full bg-white border-2 border-[#133F25]/30 rounded-2xl px-4 py-2 text-sm font-semibold text-black focus:border-[#133F25] focus:ring-0"
+                  required
+                />
+              </div>
+            )}
+
             {type === 'Rapat' && (
               <>
                 <div>
@@ -247,7 +264,8 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               isLoading || 
               !name || 
               !date || 
-              (type === 'Rapat' && (!time || !place))
+              (type === 'Rapat' && (!time || !place)) ||
+              (type === 'Tugas' && !deadline)
             } 
             className="flex items-center gap-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-extrabold text-2xl uppercase px-16 py-4 rounded-xl shadow-md hover:from-green-600 hover:to-green-800 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >

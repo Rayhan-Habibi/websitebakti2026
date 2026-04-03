@@ -54,30 +54,72 @@ export default function Absensi() {
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const img = new Image();
+    const qrImg = new Image();
 
-    img.onload = () => {
-      // Supaya resolusi tinggi
+    qrImg.onload = () => {
       const padding = 20;
-      canvas.width = img.width + (padding * 2);
-      canvas.height = img.height + (padding * 2);
+      canvas.width = qrImg.width + (padding * 2);
+      canvas.height = qrImg.height + (padding * 2);
 
       // Beri background putih (karena svg transparan)
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Letakkan ke tengah
-      ctx.drawImage(img, padding, padding);
+      // Gambar QR ke canvas
+      ctx.drawImage(qrImg, padding, padding);
 
-      // Unduh PNG
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `QR_Absensi_${user?.nama?.replace(/\s+/g, '_') || 'Panitia'}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
+      // Gambar logo di tengah QR secara terpisah (karena SVG serialization tidak bisa render external image)
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      logoImg.onload = () => {
+        const logoSize = qrImg.width * 0.22; // ~22% dari ukuran QR
+        const logoX = (canvas.width - logoSize) / 2;
+        const logoY = (canvas.height - logoSize) / 2;
+
+        // Background putih + border di belakang logo
+        const borderPadding = 6;
+        const borderRadius = 10;
+        const bgX = logoX - borderPadding;
+        const bgY = logoY - borderPadding;
+        const bgSize = logoSize + (borderPadding * 2);
+
+        // Rounded rectangle background
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.roundRect(bgX, bgY, bgSize, bgSize, borderRadius);
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = "#133F25";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(bgX, bgY, bgSize, bgSize, borderRadius);
+        ctx.stroke();
+
+        // Logo
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+
+        // Unduh PNG
+        const pngFile = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        downloadLink.download = `QR_Absensi_${user?.nama?.replace(/\s+/g, '_') || 'Panitia'}.png`;
+        downloadLink.href = pngFile;
+        downloadLink.click();
+      };
+
+      logoImg.onerror = () => {
+        // Jika logo gagal dimuat, unduh QR tanpa logo
+        const pngFile = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        downloadLink.download = `QR_Absensi_${user?.nama?.replace(/\s+/g, '_') || 'Panitia'}.png`;
+        downloadLink.href = pngFile;
+        downloadLink.click();
+      };
+
+      logoImg.src = baktiLogo;
     };
 
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    qrImg.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
   };
 
   // Guard: Jangan render konten sampai data user sudah lengkap
