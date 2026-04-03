@@ -4,6 +4,7 @@ import RekapAbsenPopUp from './RekapAbsenPopUp';
 import CancelIcon from '../ui/Icons/CancelIcon';
 import EditIcon from '../ui/Icons/EditIcon';
 import CancelModal from '../ui/CancelModal';
+import useAuthStore from '../../Store/useAuthStore';
 import { FiLoader, FiPieChart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 // 1. FUNGSI PEMBANTU FORMATTING (Logika Frontend)
@@ -32,6 +33,8 @@ function RekapAbsen() {
   const [namaKegiatan, setNamaKegiatan] = useState("");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('edit');
+  const role = useAuthStore((state) => state.role);
+  const isInti = role === 'INTI';
 
   const fetchKegiatan = useCallback(async (page = 1) => {
     setIsLoading(true);
@@ -106,12 +109,13 @@ function RekapAbsen() {
           
           {/* HEADER TABEL (Garis tetap border-[#014421]) */}
           <div className="flex items-center text-center py-4 font-black text-[#004D25] text-md uppercase tracking-wider border-b-2 border-[#014421] mb-2 flex-shrink-0">
-            <div className="w-[8%]">No.</div>
-            <div className="w-[32%] text-left pl-2">Nama Kegiatan</div>
-            <div className="w-[20%]">Jumlah Kehadiran</div>
-            <div className="w-[40%] flex justify-center gap-16">
-              <span>Status</span>
-              <span>Aksi</span> 
+            <div className={isInti ? "w-[6%]" : "w-[8%]"}>No.</div>
+            <div className={`${isInti ? "w-[24%]" : "w-[32%]"} text-left pl-2`}>Nama Kegiatan</div>
+            {isInti && <div className="w-[14%] text-left pl-2">Divisi</div>}
+            <div className={isInti ? "w-[16%]" : "w-[20%]"}>Jumlah Kehadiran</div>
+            <div className="w-[40%] flex">
+              <div className="w-[35%] text-center">Status</div>
+              <div className="w-[65%] text-center">Aksi</div>
             </div>
           </div>
 
@@ -123,30 +127,39 @@ function RekapAbsen() {
           )}
           {currentData.map((item, index) => {
             const status = item.status ? item.status.toLowerCase() : '';
-            const isActive = status === 'active';
+            const isActive = (status === 'active');
             const isInactive = status === 'inactive';
             const isExpired = status === 'expired';
+            const isKoordinator = (role === 'PRESIDIUM');
 
             return (
             <div 
               key={item.id} 
               className="flex items-center text-center py-2 font-semibold text-black/80 text-md border-b-2 border-[#014421] mb-1 group hover:bg-gray-50 transition-colors"
             >
-              <div className="w-[8%] text-black text-md font-bold">{indexOfFirstItem + index + 1}</div>
+              <div className={`${isInti ? "w-[6%]" : "w-[8%]"} text-black text-md font-bold`}>{indexOfFirstItem + index + 1}</div>
               
-              <div className="w-[32%] text-left pl-2 text-md font-bold text-black/90 truncate pr-2" title={item.kegiatanName}>
+              <div className={`${isInti ? "w-[24%]" : "w-[32%]"} text-left pl-2 text-md font-bold text-black/90 truncate pr-2`} title={item.nama_kegiatan}>
                   {item.nama_kegiatan}
               </div>
+
+              {isInti && (
+                <div className="w-[14%] text-left pl-2 text-md font-semibold text-black truncate pr-2" title={item.divisi?.nama_divisi || item.nama_divisi || '-'}>
+                  {item.divisi || '-'}
+                </div>
+              )}
               
-              <div className="w-[20%] text-black/60 font-black text-md tracking-wide">{item.jumlah_kehadiran}</div>
+              <div className={`${isInti ? "w-[16%]" : "w-[20%]"} text-black/60 font-black text-md tracking-wide`}>{item.jumlah_kehadiran}</div>
               
-              <div className="w-[40%] flex justify-center items-center gap-6">
+              <div className="w-[40%] flex items-center">
                 
-                <div className={`w-26 h-8 items-center flex justify-center rounded-sm font-black text-sm uppercase ${getStatusStyle(item.status)}`}>
-                  {item.status}
+                <div className="w-[35%] flex justify-center">
+                  <div className={`w-24 h-8 flex items-center justify-center rounded-sm font-black text-sm uppercase ${getStatusStyle(item.status)}`}>
+                    {item.status}
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="w-[65%] flex justify-center items-center gap-2">
                   
                   <button 
                     onClick={() => {
@@ -168,14 +181,13 @@ function RekapAbsen() {
                         setDataId(item.id)
                         setDeleteModalOpen(true)
                     }}
-                    disabled={isActive || isExpired}
+                    disabled={isKoordinator}
                     className="disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 bg-[#EB0000] text-white font-black uppercase px-3 py-2 md:px-4 md:py-2.5 rounded-md shadow-md hover:bg-red-800 transition-all duration-200 cursor-pointer hover:scale-105 disabled:hover:scale-100"
                   >
                     <CancelIcon className="w-4 h-4 flex-shrink-0" />
                     <span className='hidden lg:inline text-xs'>Delete</span>
                   </button>
 
-                  {/* NEW CHART BUTTON */}
                   <button
                     onClick={() => {
                         setModalMode('chart');

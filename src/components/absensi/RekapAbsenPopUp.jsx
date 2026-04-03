@@ -198,7 +198,23 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
         {/* --- KONTEN --- */}
         <div className="p-4 md:p-8 overflow-y-auto flex-grow relative">
 
-          
+          {/* PIE CHART - tampil di atas jika mode === 'chart' */}
+          {mode === 'chart' && statistikData && (
+            <div className="flex justify-center mb-8 border-b-2 border-gray-100 pb-8">
+              <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
+                <PieChartAbsen
+                  totalKegiatan={statistikData.total_peserta || 0}
+                  hadir={statistikData.hadir || 0}
+                  tidakHadir={statistikData.tidak_hadir || 0}
+                  izin={statistikData.izin || 0}
+                  sakit={statistikData.sakit || 0}
+                  isLoading={isLoading}
+                  title={"Statistik\nAcara"}
+                  totalLabel="Total Absen"
+                />
+              </div>
+            </div>
+          )}
 
           {mode !== 'chart' && (
             <div className="flex justify-center mb-4">
@@ -246,10 +262,14 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
               <div className="flex items-center pb-4 font-black text-[#133F25] text-sm md:text-md tracking-wider border-b-2 border-[#014421] mb-2">
                 <div className="w-[5%] text-center hidden md:block">No</div>
                 <div className="w-[30%] md:w-[25%] pl-2">Nama</div>
-                <div className="w-[18%] hidden md:block">Fakultas</div>
-                <div className="w-[20%] text-center">Status</div>
-                <div className="w-[20%] text-center">Ubah ke</div>
-                <div className="w-[25%] md:w-[12%] text-center">Aksi</div>
+                <div className="w-[20%] hidden md:block">Fakultas</div>
+                <div className={`${mode !== "chart" ? "w-[20%]" : "w-[50%]"} text-center`}>Status</div>
+                {mode !== "chart" && (
+                  <>
+                    <div className="w-[20%] text-center">Ubah ke</div>
+                    <div className="w-[25%] md:w-[12%] text-center">Aksi</div>
+                  </>
+                )}
               </div>
 
               {!isLoading && displayedData.length === 0 ? (
@@ -267,7 +287,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                       <li key={item.id} className="flex py-3 items-center font-semibold text-black/80 text-xs md:text-sm border-b-2 border-[#014421] last:border-b-2 last:border-b-[#014421] hover:bg-gray-50 transition-colors">
                         <div className="w-[5%] text-center font-black hidden md:block">{indexOfFirstItem + index + 1}</div>
                         <div className="w-[30%] md:w-[25%] font-bold pl-2 pr-2 truncate" title={item.nama}>{item.nama}</div>
-                        <div className="w-[18%] pr-2 truncate hidden md:block" title={item.fakultas}>{item.fakultas}</div>
+                        <div className={`${mode !== "chart" ? "w-[18%]" : "w-[35%]"} pr-2 truncate hidden md:block`} title={item.fakultas}>{item.fakultas}</div>
 
                         {/* 1. Status Saat Ini (Badge) */}
                         <div className="w-[20%] flex justify-center px-1">
@@ -277,6 +297,7 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                         </div>
 
                         {/* 2. Dropdown Status Baru (Unstyled) */}
+                        {mode !== "chart" && (
                         <div className="w-[20%] flex justify-center px-1">
                           <div className="relative w-full max-w-[120px]">
                             <select
@@ -294,19 +315,22 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
                             </div>
                           </div>
                         </div>
+                        )}
 
                         {/* 3. Tombol Update */}
-                        <div className="w-[25%] md:w-[12%] flex justify-center px-1">
-                          <button
-                            onClick={(e) => handleEditAbsen(item.user_id || item.target_user_id || item.userId || item.id, kegiatanId, currentStatus, e)}
-                            className={`px-2 py-1.5 rounded text-[9px] md:text-[11px] font-black shadow-sm transition-all duration-200 uppercase w-full max-w-[80px]
-                              ${isChanged ? 'bg-[#133F25] hover:bg-[#0a2314] text-white active:scale-95 cursor-pointer hover:scale-105' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'}
-                            `}
-                            disabled={!isChanged}
-                          >
-                            Update
-                          </button>
-                        </div>
+                        {mode !== "chart" && (
+                          <div className="w-[25%] md:w-[12%] flex justify-center px-1">
+                            <button
+                              onClick={(e) => handleEditAbsen(item.user_id || item.target_user_id || item.userId || item.id, kegiatanId, currentStatus, e)}
+                              className={`px-2 py-1.5 rounded text-[9px] md:text-[11px] font-black shadow-sm transition-all duration-200 uppercase w-full max-w-[80px]
+                                ${isChanged ? 'bg-[#133F25] hover:bg-[#0a2314] text-white active:scale-95 cursor-pointer hover:scale-105' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'}
+                              `}
+                              disabled={!isChanged}
+                            >
+                              Update
+                            </button>
+                          </div>
+                        )}
                       </li>
                     );
                   })}
@@ -364,9 +388,9 @@ function RekapAbsenPopUp({ isOpen, onClose, kegiatanId, namaKegiatan, mode = 'ed
 
           </div>
 
-          {/* NEW: PIE CHART RENDER */}
-          {statistikData && (
-            <div className="w-full flex justify-center my-8 border-b-2 border-gray-100 pb-8">
+          {/* PIE CHART - tampil di bawah jika mode !== 'chart' */}
+          {mode !== 'chart' && statistikData && (
+            <div className="flex justify-center my-8 border-t-2 border-gray-100 pt-8">
               <div className="w-full max-w-sm border-2 border-gray-200 rounded-2xl p-4 bg-[#F8FAFC]">
                 <PieChartAbsen
                   totalKegiatan={statistikData.total_peserta || 0}

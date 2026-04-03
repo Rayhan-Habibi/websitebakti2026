@@ -8,7 +8,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [endDate, setEndDate] = useState('');
+
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
   const divisiId = useAuthStore((state) => state.user?.divisi_id);
@@ -33,7 +33,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
     setTime('');
     setPlace('');
     setDescription('');
-    setEndDate('');
+
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +45,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
       nama_acara: name, 
       tanggal: date, 
       waktu: formattedTime, 
-      tanggal_berakhir: endDate, 
+
       lokasi: place, 
       deskripsi: description,
       divisi_id: divisiId, 
@@ -59,7 +59,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
       tugas: name,
       deskripsi: description,
       start_date: date,
-      deadline: endDate, 
+
       divisi_id: divisiId,
     };
 
@@ -185,20 +185,7 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
                 />
               </div>
 
-              <div>
-                <label htmlFor="endDate" className="block text-md font-bold text-[#133F25] mb-2 uppercase tracking-wide">
-                  Tanggal Berakhir 
-                  <span className='block text-xs text-gray-400 lowercase'>(Untuk durasi absen)</span>
-                </label>
-                <input 
-                  id="endDate"
-                  type="date" 
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full bg-white border-2 border-[#133F25]/30 rounded-2xl px-4 py-2 text-sm font-semibold text-black focus:border-[#133F25] focus:ring-0"
-                  required
-                />
-              </div>
+
             </div>
 
             {type === 'Rapat' && (
@@ -260,7 +247,6 @@ export default function AddTodoPopUp({ isOpen, onClose, onSuccess }) {
               isLoading || 
               !name || 
               !date || 
-              !endDate || 
               (type === 'Rapat' && (!time || !place))
             } 
             className="flex items-center gap-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-extrabold text-2xl uppercase px-16 py-4 rounded-xl shadow-md hover:from-green-600 hover:to-green-800 transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"

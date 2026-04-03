@@ -27,4 +27,32 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor: Otomatis logout jika token sudah expire (response 401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Hapus auth state dari Zustand store
+      const stored = localStorage.getItem('bakti-auth-storage');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          // Cek apakah memang ada token yang tersimpan (berarti ini bukan halaman login)
+          if (parsed?.state?.token) {
+            // Reset state di localStorage
+            parsed.state = { token: null, tempToken: null, user: {}, role: null };
+            localStorage.setItem('bakti-auth-storage', JSON.stringify(parsed));
+
+            // Redirect ke halaman login
+            window.location.href = '/login';
+          }
+        } catch (e) {
+          // Jika parsing gagal, abaikan
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

@@ -110,7 +110,7 @@ function ResetPassword() {
             {/* Input Email */}
             <div className="space-y-2 relative">
               <label className="text-sm font-semibold text-[#1E4D31]">
-                Old Password
+                Password Lama
               </label>
               <input
                 value={oldPassword}
